@@ -1,0 +1,90 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+import requests
+
+from . import models, schemas, auth
+from .database import get_db, engine
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Trading Bot Backend API")
+
+# --- CORS Middleware ---
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --- AUTHENTICATION ENDPOINTS ---
+@app.post("/token", response_model=schemas.Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == form_data.username).first()
+    if not user or not auth.verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/register", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.username == user.username).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    hashed_password = auth.get_password_hash(user.password)
+    db_user = models.User(username=user.username, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+# --- PREDICTION ENDPOINT ---
+@app.post("/predict/{ticker}", response_model=schemas.Prediction)
+async def create_prediction(ticker: str, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_user)):
+    try:
+        ml_service_url = f"http://localhost:8001/predict/{ticker}"
+        response = requests.get(ml_service_url, timeout=60)
+        response.raise_for_status()
+        data = response.json()
+        
+        if "error" in data:
+            raise HTTPException(status_code=503, detail=f"Prediction failed: {data['error']}")
+
+        db_prediction = models.Prediction(
+            ticker=data["ticker"],
+            last_close=data["last_close"],
+            # We don't have a predicted price, so we store the signal as text
+            predicted_close=str(data["predicted_signal"]),
+            signal=data["predicted_signal"],
+            created_at=datetime.utcnow(),
+            owner_id=current_user.id
+        )
+        db.add(db_prediction)
+        db.commit()
+        db.refresh(db_prediction)
+        
+        return db_prediction
+
+    except requests.RequestException as e:
+        raise HTTPException(status_code=503, detail=f"ML service is unavailable: {e}")
+
+@app.get("/users/me", response_model=schemas.User)
+async def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
+    return current_user
+
+@app.get("/my-predictions", response_model=list[schemas.Prediction])
+async def read_my_predictions(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    predictions = db.query(models.Prediction).filter(models.Prediction.owner_id == current_user.id).order_by(models.Prediction.created_at.desc()).limit(20).all()
+    return predictions

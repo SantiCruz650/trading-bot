@@ -1,0 +1,38 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+backtester_venv/
+ml_service/venv/
+backend/venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Redis
+redis-stable/
+redis-stable.tar.gz
+dump.rdb
+
+# Logs
+logs/
+*.log
+*.pid
+
+# Data (Keep structure but ignore large data if any)
+data/*.rdb
+data/*.json
+!data/ngrok_urls.json
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Deployment
+.env

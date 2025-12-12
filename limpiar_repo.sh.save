@@ -1,0 +1,50 @@
+#!/bin/bash
+
+echo "🔍 Limpiando tu repositorio de archivos pesados..."
+
+# 1. borrar caché de git de cosas grandes
+git rm -r --cached venv .venv backtester_venv ml_service redis-stable redis-stable.tar.gz 2>/dev/null
+git rm -r --cached __pycache__ 2>/dev/null
+git rm --cached *.db *.sqlite *.log dump.rdb 2>/dev/null
+
+# 2. generar requirements
+echo "📦 Generando requirements.txt..."
+pip freeze > requirements.txt
+
+# 3. asegurar .gitignore
+if [ ! -f .gitignore ]; then
+    echo "📝 Creando .gitignore..."
+    cat << EOF > .gitignore
+# Entornos virtuales
+venv/
+.venv/
+backtester_venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Bases de datos
+*.db
+*.sqlite
+dump.rdb
+
+# Logs
+*.log
+
+# Archivos grandes
+redis-stable/
+redis-stable.tar.gz
+EOF
+fi
+
+# 4. agregar cambios
+echo "📁 Agregando cambios al commit..."
+git add .
+
+# 5. commit
+echo "📝 Haciendo commit..."
+git commit -m "Cleanup: removed venv, db, logs, binaries; added requirements.txt"
+
+echo "✨ Limpieza completa. Ahora puedes hacer:"
+echo "git push -u origin main"

@@ -1,0 +1,77 @@
+/* --- A More Colorful & Modern Theme --- */
+
+/* Gradient Background */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Colorful Navbar */
+.navbar {
+    background-color: #3f51b5 !important; /* A nice indigo */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Main Card Styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden; /* This makes the header corners round */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Add a colorful header to the card */
+.card .card-body::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    margin: -1.25rem -1.25rem 1.25rem -1.25rem; /* Position it at the top */
+}
+
+/* Button and Input Styling */
+.btn-primary {
+    background-color: #f5576c;
+    border-color: #f5576c;
+    border-radius: 0 8px 8px 0;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #e63946;
+    border-color: #e63946;
+}
+
+#ticker-input {
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+}
+
+/* Result Styling */
+.signal-buy { 
+    background-color: #28a745; /* A brighter green */
+    color: white;
+}
+.signal-sell { 
+    background-color: #dc3545; /* A brighter red */
+    color: white;
+}
+.signal-hold { 
+    background-color: #ffc107; 
+    color: #212529; /* Dark text for contrast */
+}
+
+/* Make the result text pop */
+#prediction-result h4, #prediction-result p {
+    color: #333;
+}
