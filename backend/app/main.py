@@ -85,6 +85,12 @@ async def websocket_endpoint(websocket: WebSocket):
 # Serve frontend assets via FastAPI so the same domain handles UI + API
 # Mount this LAST so it doesn't override API or WebSocket routes
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
+print(f"DEBUG: Calculated FRONTEND_DIR: {FRONTEND_DIR}")
+print(f"DEBUG: FRONTEND_DIR exists? {FRONTEND_DIR.exists()}")
+
 if FRONTEND_DIR.exists():
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+    print("DEBUG: Mounted frontend static files")
+else:
+    print("ERROR: Frontend directory not found, static files NOT mounted")
 

@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
+COPY shared/ ./shared/
 COPY start_docker.sh .
 
 # Make start script executable
