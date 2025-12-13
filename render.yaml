@@ -10,12 +10,3 @@ services:
         value: "3.11.0"
       - key: PORT
         value: "8000"
-  # Redis Service (Moved from databases)
-  - type: redis
-    name: mcrypto-redis
-
-databases:
-  - name: mcrypto-db
-    databaseName: mcrypto
-    user: mcrypto_user
-    plan: free
