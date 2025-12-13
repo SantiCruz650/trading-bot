@@ -12,7 +12,7 @@ celery==5.3.6
 python-telegram-bot==20.8
 redis==5.0.1
 websockets==12.0
-ccxt==4.1.93
+ccxt>=4.1.93
 requests==2.31.0
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
