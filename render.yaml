@@ -23,13 +23,14 @@ services:
   # Frontend (Static Site) - Served by Backend in this setup for simplicity on free tier
   # Ideally, frontend would be a separate static site, but serving from FastAPI saves a service slot.
 
+  # Redis Service (Moved from databases)
+  - type: redis
+    name: mcrypto-redis
+    plan: free
+    ipAllowList: [] # Allow internal connections
+
 databases:
   - name: mcrypto-db
     databaseName: mcrypto
     user: mcrypto_user
     plan: free
-
-  - name: mcrypto-redis
-    type: redis
-    plan: free
-    # ipAllowList removed to use default internal access
