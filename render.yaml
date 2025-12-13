@@ -1,33 +1,18 @@
 services:
-  # Backend Service
   - type: web
-    name: mcrypto-backend
-    env: python
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
+    name: mcrypto-bot
+    env: docker
+    plan: free
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: mcrypto-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: mcrypto-redis
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
         value: "3.11.0"
-
-  # Frontend (Static Site) - Served by Backend in this setup for simplicity on free tier
-  # Ideally, frontend would be a separate static site, but serving from FastAPI saves a service slot.
-
+      - key: PORT
+        value: "8000"
   # Redis Service (Moved from databases)
   - type: redis
     name: mcrypto-redis
-    plan: free
-    ipAllowList: [] # Allow internal connections
 
 databases:
   - name: mcrypto-db
