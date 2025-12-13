@@ -18,7 +18,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: "3.11.0"
 
   # Frontend (Static Site) - Served by Backend in this setup for simplicity on free tier
   # Ideally, frontend would be a separate static site, but serving from FastAPI saves a service slot.
@@ -32,4 +32,4 @@ databases:
   - name: mcrypto-redis
     type: redis
     plan: free
-    ipAllowList: [] # Allow all internal connections
+    # ipAllowList removed to use default internal access
