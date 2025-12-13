@@ -2,9 +2,8 @@
 // API_URL and ML_API_URL are declared in config_runtime.js
 const WS_URL = (function () {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const hostname = window.location.hostname;
-    // Always connect to backend port 8000 for WebSockets
-    return `${protocol}//${hostname}:8000/ws/predictions`;
+    const host = window.location.host; // Includes port if present
+    return `${protocol}//${host}/ws/predictions`;
 })();
 const ACCESS_KEY = 'MCrypto2024';
 
