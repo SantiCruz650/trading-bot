@@ -53,6 +53,21 @@ def create_enhanced_features(df, look_back_days=30):
     df['macd_signal'] = df['macd'].rolling(window=9).mean()
     df['macd_histogram'] = df['macd'] - df['macd_signal']
     
+    # ATR (Average True Range) for Volatility Regime
+    high_low = df['close'].rolling(window=2).max() - df['close'].rolling(window=2).min() # Simplified for daily
+    df['atr_14'] = high_low.rolling(window=14).mean()
+    
+    # ADX (Average Directional Index) for Trend Strength
+    # Simplified ADX implementation
+    plus_dm = df['close'].diff().clip(lower=0)
+    minus_dm = (-df['close'].diff()).clip(lower=0)
+    tr = df['close'].rolling(window=14).max() - df['close'].rolling(window=14).min()
+    
+    plus_di = 100 * (plus_dm.rolling(window=14).mean() / tr)
+    minus_di = 100 * (minus_dm.rolling(window=14).mean() / tr)
+    dx = 100 * (abs(plus_di - minus_di) / (plus_di + minus_di))
+    df['adx_14'] = dx.rolling(window=14).mean()
+
     # Day of week effect
     df['day_of_week'] = pd.to_datetime(df['date']).dt.dayofweek
     df['is_monday'] = (df['day_of_week'] == 0).astype(int)

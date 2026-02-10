@@ -1,0 +1,607 @@
+{
+    "date": "2026-01-12",
+    "total_trades_today": 78,
+    "assets_traded": [
+        "ETH"
+    ],
+    "total_bought_today": 78.0,
+    "total_sold_today": 0,
+    "current_balance": 226.49779836205002,
+    "balance_start_of_day": -604.7663553130932,
+    "daily_cash_flow": 831.2641536751432,
+    "portfolio": {
+        "BTC": {
+            "amount": 0.0014418114442005167,
+            "value_usdt": 65.08692141439738,
+            "last_price": 45142.46413856704
+        },
+        "ETH": {
+            "amount": 0.6376448569190207,
+            "value_usdt": 1663.263757879183,
+            "last_price": 2608.4484801081258
+        }
+    },
+    "total_portfolio_value": 1954.8484776556304,
+    "total_pnl_usdt": 954.8484776556304,
+    "total_pnl_pct": 95.48484776556305,
+    "daily_trades": [
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2574.5731338167952,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 01:53:05.242320"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2572.779433938967,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 01:54:34.608995"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.4833695022276,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 01:56:02.839326"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.9873016152205,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 01:57:34.217216"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2572.9277005951653,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 01:58:46.868217"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2574.3917539820504,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:00:02.169300"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.6097218444147,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:01:17.795306"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.8561006827917,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:02:34.490492"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.587293406894,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:03:47.568878"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2575.6895613723414,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:05:01.934199"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2571.4494450528373,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:06:27.612531"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.013896414726,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:07:49.809337"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2572.1873977131804,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:09:08.507492"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2572.402645062064,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:10:31.313584"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2571.6679667172834,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:11:54.188413"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2571.126887948011,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:13:16.521420"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2573.8473919466196,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:14:35.952323"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2569.5175218952472,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:15:59.252874"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2575.1788334528655,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:17:26.924596"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.3572961176415,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:18:48.989234"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.938323591477,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:20:26.472824"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2582.3315707900542,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:21:49.087271"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.417697843267,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:23:09.683974"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.184859081177,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:24:32.513024"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.277939153621,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:25:53.325162"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2574.5155982926526,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:27:12.349962"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2578.7855883049383,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:28:34.783618"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2578.6409558455175,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:29:57.407093"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.936788234883,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:31:19.383359"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2584.475752686352,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:32:41.064907"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2587.666434532055,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:34:01.768280"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2589.1577271609394,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:35:20.443950"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.509202513355,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:36:45.224089"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.2056952274497,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:38:09.341045"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.900134380085,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:39:38.816400"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2586.0875348808186,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:41:04.575074"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2590.635367353018,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:42:24.134276"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2589.5389346357983,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:43:44.186367"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2585.7851232718085,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:45:19.342160"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2585.0239659372182,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:46:39.165894"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.9668449856435,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:48:00.661860"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2584.144815965595,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:49:36.120303"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.7040342459923,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:50:56.348734"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2584.1161272760173,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:52:16.329339"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2577.6494399601556,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:53:38.547878"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.0258036432424,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:54:59.677089"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.5495613535054,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 02:56:20.345423"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.5698610348954,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:07:43.788696"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2579.8228040430663,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:09:19.890167"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2585.9691857097896,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:10:56.150308"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.794109859221,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:12:15.350001"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2578.5363919207475,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:13:34.793696"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.164389155303,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:14:53.643536"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2578.659109571915,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:16:12.689730"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.0927346723847,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 03:17:32.732670"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2581.0736342596915,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:18:46.189962"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.0936961548296,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:20:08.897292"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2583.206656516916,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:21:31.297852"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2582.8800073988973,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:22:49.568657"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2585.1242498167467,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:24:09.879832"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2582.9695301451015,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:25:31.229677"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2587.1759047792775,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:26:48.178720"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2586.304226044496,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:28:13.041462"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2586.451667991955,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:29:46.054993"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2589.2025257570435,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 07:31:09.837210"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2587.7152391821596,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:42:51.676562"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2592.8834087255955,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:44:10.351831"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2593.140513199427,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:45:23.375805"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2595.3965121314563,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:47:03.634060"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2597.2985911511632,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:48:37.136419"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2602.5915764726915,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:49:54.862502"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2602.194534159498,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:51:12.912532"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2599.5488738627128,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:52:30.643527"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2597.9124985281005,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:53:48.483193"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2599.6259033846636,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:55:06.370111"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2602.436544804725,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:56:24.268885"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2608.2076994000176,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:57:42.009455"
+        },
+        {
+            "ticker": "ETH",
+            "side": "BUY",
+            "price": 2608.4484801081258,
+            "amount": 1.0,
+            "timestamp": "2026-01-12 10:59:15.301080"
+        }
+    ],
+    "daily_pnl": 0,
+    "eth_accumulated": 0.637645,
+    "daily_max_drawdown_pct": 0.83,
+    "bot_status": "ACTIVE",
+    "avg_price_ETH": 2583.2730453098297,
+    "max_drawdown_pct": 8.52,
+    "total_cycles": 14164,
+    "win_rate_pct": 100.0,
+    "profit_factor": 63.91,
+    "avg_time_between_trades_sec": 290.08,
+    "equity_curve": [
+        968.01,
+        969.42,
+        968.06,
+        970.72,
+        970.17,
+        970.26,
+        972.01,
+        971.06,
+        974.34,
+        974.51,
+        975.94,
+        977.15,
+        980.52,
+        980.26,
+        978.58,
+        977.54,
+        978.63,
+        980.42,
+        984.1,
+        984.26
+    ]
+}

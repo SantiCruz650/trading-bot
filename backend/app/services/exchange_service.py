@@ -7,39 +7,52 @@ import os
 from typing import Dict, List, Optional
 from datetime import datetime
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
 
 from ..core.config import settings
+from shared.market_simulator import market_simulator
 
 class ExchangeService:
     """
-    Wrapper for Binance exchange API using ccxt
-    Supports both live trading and testnet (paper trading)
+    Wrapper for exchange API.
+    Supports LOCAL_SIMULATION (no internet), testnet, and live.
     """
     _instance = None
+    _lock = threading.Lock()
 
-    def __new__(cls, testnet: bool = True):
+    def __new__(cls, testnet: bool = True, local_simulation: bool = True):
         if cls._instance is None:
-            cls._instance = super(ExchangeService, cls).__new__(cls)
-            cls._instance.initialized = False
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super(ExchangeService, cls).__new__(cls)
+                    cls._instance.initialized = False
         return cls._instance
 
-    def __init__(self, testnet: bool = True):
+    def __init__(self, testnet: bool = True, local_simulation: bool = True):
         """
         Initialize exchange connection
         
         Args:
-            testnet: If True, use Binance testnet (paper trading)
-            If False, use live Binance (REAL MONEY)
+            testnet: If True, use Binance testnet
+            local_simulation: If True, use internal MarketSimulator (NO NETWORK)
         """
         if self.initialized:
             return
             
-        self.testnet = testnet
+        self.testnet = True
+        self.local_simulation = True
         self.exchange = None
-        self._initialize_exchange()
+        self.virtual_balance = 1000.0  # Initial virtual balance for local simulation
+        
+        if not self.local_simulation:
+            self._initialize_exchange()
+        else:
+            print("💰 Virtual balance initialized: 1000.0 USDT")
+            print("📈 Market Simulator ACTIVE (Local Paper Trading)")
+            
         self.initialized = True
         
     def _initialize_exchange(self):
@@ -54,38 +67,38 @@ class ExchangeService:
                 api_secret = settings.BINANCE_API_SECRET
             
             if not api_key or not api_secret:
-                raise ValueError(
-                    f"Missing API credentials in environment variables. "
-                    f"Set {'BINANCE_TESTNET_API_KEY/SECRET' if self.testnet else 'BINANCE_API_KEY/SECRET'}"
-                )
+                logger.warning("Missing API credentials. Defaulting to LOCAL SIMULATION.")
+                self.local_simulation = True
+                return
             
             # Initialize ccxt Binance exchange
             self.exchange = ccxt.binance({
                 'apiKey': api_key,
                 'secret': api_secret,
-                'enableRateLimit': True,  # Critical for avoiding API bans
+                'enableRateLimit': True,
                 'options': {
-                    'defaultType': 'spot',  # Use spot trading (not futures)
+                    'defaultType': 'spot',
                 }
             })
             
-            # Set testnet URL if in testnet mode
             if self.testnet:
                 self.exchange.set_sandbox_mode(True)
                 logger.info("✅ Connected to Binance TESTNET (Paper Trading)")
             else:
                 logger.warning("⚠️ Connected to Binance LIVE (REAL MONEY)")
                 
-            # Test connection
             self.exchange.load_markets()
             logger.info(f"Exchange initialized successfully. Markets loaded: {len(self.exchange.markets)}")
             
         except Exception as e:
-            logger.error(f"Failed to initialize exchange: {e}")
-            raise
+            logger.error(f"Failed to initialize exchange: {e}. Falling back to LOCAL SIMULATION.")
+            self.local_simulation = True
     
     def get_balance(self, currency: str = 'USDT') -> float:
-        """Get account balance for specific currency"""
+        """Get account balance"""
+        if self.local_simulation:
+            return self.virtual_balance
+            
         try:
             balance = self.exchange.fetch_balance()
             return float(balance.get(currency, {}).get('free', 0.0))
@@ -94,7 +107,14 @@ class ExchangeService:
             return 0.0
     
     def get_ticker_price(self, symbol: str) -> Optional[float]:
-        """Get current market price for a symbol"""
+        """Get current market price"""
+        if self.local_simulation:
+            # Use local simulator
+            # Ensure symbol format is correct (e.g. BTC/USDT)
+            if '/' not in symbol and 'USDT' in symbol:
+                symbol = symbol.replace('USDT', '/USDT')
+            return market_simulator.get_price(symbol)
+            
         try:
             ticker = self.exchange.fetch_ticker(symbol)
             return float(ticker['last'])
@@ -109,7 +129,7 @@ class ExchangeService:
         amount: float,
         stop_loss_pct: Optional[float] = None
     ) -> Optional[Dict]:
-        """Place a market order (executes immediately at current price)"""
+        """Place a market order"""
         try:
             if side not in ['buy', 'sell']:
                 raise ValueError(f"Invalid side: {side}. Must be 'buy' or 'sell'")
@@ -117,8 +137,37 @@ class ExchangeService:
             if amount <= 0:
                 raise ValueError(f"Invalid amount: {amount}. Must be positive")
             
-            logger.info(f"Placing {side.upper()} market order: {amount} {symbol}")
+            price = self.get_ticker_price(symbol)
+            if not price:
+                return None
+                
+            cost = amount * price
             
+            if self.local_simulation:
+                if side == 'buy' and cost > self.virtual_balance:
+                    logger.error(f"Insufficient virtual balance: {self.virtual_balance} < {cost}")
+                    return None
+                
+                # Update virtual balance
+                if side == 'buy':
+                    self.virtual_balance -= cost
+                else:
+                    self.virtual_balance += cost
+                
+                order_id = f"sim_{int(datetime.now().timestamp())}"
+                logger.info(f"✅ [SIM] {side.upper()} {amount} {symbol} @ ${price:,.2f} | Balance: ${self.virtual_balance:,.2f}")
+                
+                return {
+                    'id': order_id,
+                    'symbol': symbol,
+                    'side': side,
+                    'amount': amount,
+                    'price': price,
+                    'status': 'filled'
+                }
+            
+            # Real/Testnet order via ccxt
+            logger.info(f"Placing {side.upper()} market order: {amount} {symbol}")
             order = self.exchange.create_market_order(
                 symbol=symbol,
                 side=side,
@@ -209,9 +258,9 @@ class ExchangeService:
 # Singleton instance
 _exchange_instance = None
 
-def get_exchange(testnet: bool = True) -> ExchangeService:
+def get_exchange(testnet: bool = True, local_simulation: bool = True) -> ExchangeService:
     """Get or create exchange service instance"""
     global _exchange_instance
     if _exchange_instance is None:
-        _exchange_instance = ExchangeService(testnet=testnet)
+        _exchange_instance = ExchangeService(testnet=testnet, local_simulation=local_simulation)
     return _exchange_instance

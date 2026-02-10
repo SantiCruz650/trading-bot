@@ -9,7 +9,7 @@ pkill -f "uvicorn.*8001"
 
 # Start Redis
 echo "Starting Redis..."
-./redis-stable/src/redis-server --daemonize yes
+redis-server --daemonize yes
 echo "Redis started."
 
 # Start Backend

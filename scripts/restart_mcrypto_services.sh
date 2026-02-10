@@ -20,7 +20,7 @@ nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload > backend.log 2>&
 echo "MCrypto Backend started on port 8000"
 
 # Start Frontend in background
-cd ~/trading-bot/frontend
+cd ~/trading-bot/frontend_v2
 nohup python3 -m http.server 8080 > frontend.log 2>&1 &
 echo "MCrypto Frontend started on port 8080"
 

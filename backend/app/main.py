@@ -16,11 +16,18 @@ from .models.models import Base
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+from app.services.report_service import generate_report
+
 app = FastAPI(
-    title=settings.PROJECT_NAME
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION
     # root_path is only needed for reverse proxy setups like ngrok
     # For local dev, we'll handle /api prefix in the router includes
 )
+
+@app.get("/report")
+def get_daily_report(date: str = None):
+    return generate_report(date)
 
 @app.get("/health")
 async def health_check():
@@ -42,17 +49,25 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-from .services.market_stream import market_stream
+# from .services.market_stream import market_stream  # Deactivated WebSocket
+from .services.polling_service import polling_service
 import asyncio
 
 @app.on_event("startup")
 async def startup_event():
-    # Start market stream in background
-    asyncio.create_task(market_stream.start())
+    print("DEBUG: Executing startup_event")
+    # Start REST polling in background (Replaces WebSocket)
+    asyncio.create_task(polling_service.start())
+    
+    import os
+    if os.getenv("HEADLESS_MODE") == "true" or True: # Always show in this local setup
+        print("🤖 Bot running in LOCAL PAPER TRADING MODE")
+        print("📈 Market Simulator ACTIVE")
+        print("📡 Strategy Engine ACTIVE")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await market_stream.stop()
+    await polling_service.stop()
 
 # Include routers with /api prefix
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
@@ -63,34 +78,21 @@ from .api import strategies, trading_live
 app.include_router(strategies.router, prefix="/api/strategies", tags=["strategies"])
 app.include_router(trading_live.router, prefix="/api/trading-live", tags=["live-trading"])
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
-from .services.websocket_manager import manager
 
 # ... imports ...
 
 # ... existing code ...
 
 # Serve frontend assets via FastAPI so the same domain handles UI + API
-@app.websocket("/ws/predictions")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
-    try:
-        while True:
-            # Keep connection alive, maybe listen for client pings
-            await websocket.receive_text()
-    except WebSocketDisconnect:
-        manager.disconnect(websocket)
-
-# Serve frontend assets via FastAPI so the same domain handles UI + API
 # Mount this LAST so it doesn't override API or WebSocket routes
-FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
+FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend_v2"
 print(f"DEBUG: Calculated FRONTEND_DIR: {FRONTEND_DIR}")
 print(f"DEBUG: FRONTEND_DIR exists? {FRONTEND_DIR.exists()}")
 
 if FRONTEND_DIR.exists():
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
-    print("DEBUG: Mounted frontend static files")
+    print("DEBUG: Mounted frontend_v2 static files")
 else:
     print("ERROR: Frontend directory not found, static files NOT mounted")
 

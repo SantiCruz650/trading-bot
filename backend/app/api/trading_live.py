@@ -120,8 +120,8 @@ async def execute_trade(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Trade execution error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Trade execution error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.get("/balance")
@@ -137,8 +137,8 @@ async def get_balance(current_user: UserModel = Depends(get_current_user)):
             "formatted": f"${balance:,.2f}"
         }
     except Exception as e:
-        logger.error(f"Error fetching balance: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error fetching balance: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.get("/positions")
@@ -174,8 +174,8 @@ async def get_positions(current_user: UserModel = Depends(get_current_user)):
         }
         
     except Exception as e:
-        logger.error(f"Error fetching positions: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error fetching positions: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.post("/emergency/close-all")
@@ -197,8 +197,8 @@ async def emergency_close_all(current_user: UserModel = Depends(get_current_user
         }
         
     except Exception as e:
-        logger.error(f"Emergency close error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Emergency close error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.post("/emergency/cancel-orders")
@@ -219,8 +219,8 @@ async def emergency_cancel_orders(current_user: UserModel = Depends(get_current_
         }
         
     except Exception as e:
-        logger.error(f"Emergency cancel error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Emergency cancel error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.get("/risk/stats")
@@ -234,13 +234,19 @@ async def get_risk_stats(current_user: UserModel = Depends(get_current_user)):
             "daily_trades": stats['trades'],
             "daily_pnl": stats['pnl'],
             "current_exposure": stats['exposure'],
+            "exposure_ratio": stats['exposure'],
+            "daily_drawdown_pct": stats['daily_drawdown'] * 100,
+            "gec_state": stats['gec_state'],
+            "freeze_active": stats['freeze_active'],
+            "freeze_reason": stats['freeze_reason'],
+            "kill_switch_active": stats['kill_switch_active'],
             "circuit_breaker_active": risk_mgr.circuit_breaker_active,
             "circuit_breaker_reason": risk_mgr.circuit_breaker_reason
         }
         
     except Exception as e:
-        logger.error(f"Error fetching risk stats: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error fetching risk stats: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
 
 
 @router.post("/risk/reset-circuit-breaker")
@@ -261,5 +267,45 @@ async def reset_circuit_breaker(current_user: UserModel = Depends(get_current_us
         }
         
     except Exception as e:
-        logger.error(f"Error resetting circuit breaker: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error resetting circuit breaker: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")
+
+
+@router.get("/risk/gec-status")
+async def get_gec_status(current_user: UserModel = Depends(get_current_user)):
+    """
+    Get detailed Global Exposure Cap status and adjustments
+    """
+    try:
+        risk_mgr = RiskManager()
+        adjustments = risk_mgr.get_gec_adjustments()
+        er = risk_mgr.calculate_exposure_ratio()
+        dd = risk_mgr.calculate_daily_drawdown()
+        
+        from app.core.config import settings
+        
+        return {
+            "exposure_ratio": er,
+            "daily_drawdown_pct": dd * 100,
+            "gec_state": risk_mgr.gec_state,
+            "freeze_active": risk_mgr.freeze_active,
+            "freeze_reason": risk_mgr.freeze_reason,
+            "soft_cap_active": risk_mgr.gec_state in ["SOFT_CAP", "HARD_CAP", "KILL_SWITCH"],
+            "hard_cap_active": risk_mgr.gec_state in ["HARD_CAP", "KILL_SWITCH"],
+            "kill_switch_active": risk_mgr.kill_switch_active,
+            "adjustments": {
+                "order_size_reduction_pct": (1 - adjustments["order_size_multiplier"]) * 100,
+                "dca_step_increase_pct": (adjustments["dca_step_multiplier"] - 1) * 100
+            },
+            "thresholds": {
+                "soft_cap": settings.GEC_SOFT_CAP,
+                "hard_cap": settings.GEC_HARD_CAP,
+                "freeze_dd": settings.FREEZE_DD_THRESHOLD * 100,
+                "kill_switch_dd": settings.KILL_SWITCH_DD_THRESHOLD * 100,
+                "kill_switch_er": settings.KILL_SWITCH_ER_THRESHOLD
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error fetching GEC status: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal execution error")

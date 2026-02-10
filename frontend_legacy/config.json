@@ -1,0 +1,12 @@
+{
+    "local": {
+        "frontend": "http://localhost:8080",
+        "backend": "http://localhost:8000",
+        "ml": "http://localhost:8001"
+    },
+    "ngrok": {
+        "frontend": "https://karl-utilizable-atheistically.ngrok-free.dev",
+        "backend": "https://karl-utilizable-atheistically.ngrok-free.dev/api",
+        "ml": "https://karl-utilizable-atheistically.ngrok-free.dev/ml"
+    }
+}

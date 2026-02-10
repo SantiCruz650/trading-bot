@@ -1,0 +1,500 @@
+🕒 [13:05:24] SOL/USDT: $106.32 | Balance: $278.02 | SOL: 0.000000
+🕒 [13:05:24] DOGE/USDT: $0.08 | Balance: $278.02 | DOGE: 0.000000
+🕒 [13:05:39] BTC/USDT: $44,758.30 | Balance: $278.02 | BTC: 0.001442
+🕒 [13:05:40] ETH/USDT: $2,511.70 | Balance: $278.02 | ETH: 1.719712
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:05:40] ADA/USDT: $0.48 | Balance: $278.02 | ADA: 0.000000
+🕒 [13:05:40] SOL/USDT: $106.46 | Balance: $278.02 | SOL: 0.000000
+🕒 [13:05:40] DOGE/USDT: $0.08 | Balance: $278.02 | DOGE: 0.000000
+🕒 [13:05:55] BTC/USDT: $44,756.35 | Balance: $278.02 | BTC: 0.001442
+🕒 [13:05:55] ETH/USDT: $2,512.74 | Balance: $278.02 | ETH: 1.719712
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:05:56] ADA/USDT: $0.48 | Balance: $278.02 | ADA: 0.000000
+🕒 [13:05:56] SOL/USDT: $106.48 | Balance: $278.02 | SOL: 0.000000
+🕒 [13:05:56] DOGE/USDT: $0.08 | Balance: $278.02 | DOGE: 0.000000
+🕒 [13:06:11] BTC/USDT: $44,736.15 | Balance: $278.02 | BTC: 0.001442
+🕒 [13:06:11] ETH/USDT: $2,512.94 | Balance: $278.02 | ETH: 1.719712
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:06:11] ADA/USDT: $0.48 | Balance: $278.02 | ADA: 0.000000
+🕒 [13:06:12] SOL/USDT: $106.29 | Balance: $278.02 | SOL: 0.000000
+🕒 [13:06:12] DOGE/USDT: $0.08 | Balance: $278.02 | DOGE: 0.000000
+🕒 [13:06:27] BTC/USDT: $44,730.43 | Balance: $278.02 | BTC: 0.001442
+🕒 [13:06:27] ETH/USDT: $2,514.35 | Balance: $278.02 | ETH: 1.719712
+🌐 Market Regime: TREND_UP (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,514.35 | Amount: 2.00 USDT | Balance: $278.02 -> $276.02
+🕒 [13:06:28] ADA/USDT: $0.48 | Balance: $276.02 | ADA: 0.000000
+🕒 [13:06:28] SOL/USDT: $106.33 | Balance: $276.02 | SOL: 0.000000
+🕒 [13:06:28] DOGE/USDT: $0.08 | Balance: $276.02 | DOGE: 0.000000
+🕒 [13:06:43] BTC/USDT: $44,740.71 | Balance: $276.02 | BTC: 0.001442
+🕒 [13:06:43] ETH/USDT: $2,513.98 | Balance: $276.02 | ETH: 1.720508
+🌐 Market Regime: TREND_UP (Strictness: NORMAL)
+🕒 [13:06:44] ADA/USDT: $0.48 | Balance: $276.02 | ADA: 0.000000
+🕒 [13:06:44] SOL/USDT: $106.53 | Balance: $276.02 | SOL: 0.000000
+🕒 [13:06:44] DOGE/USDT: $0.08 | Balance: $276.02 | DOGE: 0.000000
+🕒 [13:06:59] BTC/USDT: $44,735.17 | Balance: $276.02 | BTC: 0.001442
+🕒 [13:06:59] ETH/USDT: $2,513.70 | Balance: $276.02 | ETH: 1.720508
+🌐 Market Regime: TREND_UP (Strictness: NORMAL)
+🕒 [13:06:59] ADA/USDT: $0.48 | Balance: $276.02 | ADA: 0.000000
+🕒 [13:06:59] SOL/USDT: $106.52 | Balance: $276.02 | SOL: 0.000000
+🕒 [13:06:59] DOGE/USDT: $0.08 | Balance: $276.02 | DOGE: 0.000000
+🕒 [13:07:14] BTC/USDT: $44,736.35 | Balance: $276.02 | BTC: 0.001442
+🕒 [13:07:15] ETH/USDT: $2,514.69 | Balance: $276.02 | ETH: 1.720508
+🌐 Market Regime: TREND_UP (Strictness: NORMAL)
+🕒 [13:07:15] ADA/USDT: $0.48 | Balance: $276.02 | ADA: 0.000000
+🕒 [13:07:15] SOL/USDT: $106.63 | Balance: $276.02 | SOL: 0.000000
+🕒 [13:07:15] DOGE/USDT: $0.08 | Balance: $276.02 | DOGE: 0.000000
+🕒 [13:07:30] BTC/USDT: $44,751.04 | Balance: $276.02 | BTC: 0.001442
+🕒 [13:07:30] ETH/USDT: $2,513.13 | Balance: $276.02 | ETH: 1.720508
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:07:31] ADA/USDT: $0.48 | Balance: $276.02 | ADA: 0.000000
+🕒 [13:07:31] SOL/USDT: $106.83 | Balance: $276.02 | SOL: 0.000000
+🕒 [13:07:31] DOGE/USDT: $0.08 | Balance: $276.02 | DOGE: 0.000000
+🕒 [13:07:46] BTC/USDT: $44,768.51 | Balance: $276.02 | BTC: 0.001442
+🕒 [13:07:47] ETH/USDT: $2,511.75 | Balance: $276.02 | ETH: 1.720508
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,511.75 | Amount: 2.00 USDT | Balance: $276.02 -> $274.02
+🕒 [13:07:47] ADA/USDT: $0.48 | Balance: $274.02 | ADA: 0.000000
+🕒 [13:07:47] SOL/USDT: $106.89 | Balance: $274.02 | SOL: 0.000000
+🕒 [13:07:47] DOGE/USDT: $0.08 | Balance: $274.02 | DOGE: 0.000000
+🕒 [13:08:02] BTC/USDT: $44,790.30 | Balance: $274.02 | BTC: 0.001442
+🕒 [13:08:03] ETH/USDT: $2,510.02 | Balance: $274.02 | ETH: 1.721304
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:08:03] ADA/USDT: $0.48 | Balance: $274.02 | ADA: 0.000000
+🕒 [13:08:03] SOL/USDT: $106.74 | Balance: $274.02 | SOL: 0.000000
+🕒 [13:08:03] DOGE/USDT: $0.08 | Balance: $274.02 | DOGE: 0.000000
+🕒 [13:08:18] BTC/USDT: $44,784.92 | Balance: $274.02 | BTC: 0.001442
+🕒 [13:08:19] ETH/USDT: $2,508.21 | Balance: $274.02 | ETH: 1.721304
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:08:19] ADA/USDT: $0.48 | Balance: $274.02 | ADA: 0.000000
+🕒 [13:08:19] SOL/USDT: $106.73 | Balance: $274.02 | SOL: 0.000000
+🕒 [13:08:19] DOGE/USDT: $0.08 | Balance: $274.02 | DOGE: 0.000000
+🕒 [13:08:34] BTC/USDT: $44,778.39 | Balance: $274.02 | BTC: 0.001442
+🕒 [13:08:34] ETH/USDT: $2,506.25 | Balance: $274.02 | ETH: 1.721304
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:08:35] ADA/USDT: $0.48 | Balance: $274.02 | ADA: 0.000000
+🕒 [13:08:35] SOL/USDT: $106.71 | Balance: $274.02 | SOL: 0.000000
+🕒 [13:08:35] DOGE/USDT: $0.08 | Balance: $274.02 | DOGE: 0.000000
+🕒 [13:08:50] BTC/USDT: $44,789.11 | Balance: $274.02 | BTC: 0.001442
+🕒 [13:08:50] ETH/USDT: $2,505.31 | Balance: $274.02 | ETH: 1.721304
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:08:51] ADA/USDT: $0.48 | Balance: $274.02 | ADA: 0.000000
+🕒 [13:08:51] SOL/USDT: $106.86 | Balance: $274.02 | SOL: 0.000000
+🕒 [13:08:51] DOGE/USDT: $0.08 | Balance: $274.02 | DOGE: 0.000000
+🕒 [13:09:06] BTC/USDT: $44,790.14 | Balance: $274.02 | BTC: 0.001442
+🕒 [13:09:06] ETH/USDT: $2,505.95 | Balance: $274.02 | ETH: 1.721304
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,505.95 | Amount: 2.00 USDT | Balance: $274.02 -> $272.02
+🕒 [13:09:07] ADA/USDT: $0.48 | Balance: $272.02 | ADA: 0.000000
+🕒 [13:09:07] SOL/USDT: $106.91 | Balance: $272.02 | SOL: 0.000000
+🕒 [13:09:07] DOGE/USDT: $0.08 | Balance: $272.02 | DOGE: 0.000000
+🕒 [13:09:22] BTC/USDT: $44,803.29 | Balance: $272.02 | BTC: 0.001442
+🕒 [13:09:22] ETH/USDT: $2,504.74 | Balance: $272.02 | ETH: 1.722102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:09:23] ADA/USDT: $0.48 | Balance: $272.02 | ADA: 0.000000
+🕒 [13:09:23] SOL/USDT: $107.01 | Balance: $272.02 | SOL: 0.000000
+🕒 [13:09:23] DOGE/USDT: $0.08 | Balance: $272.02 | DOGE: 0.000000
+🕒 [13:09:38] BTC/USDT: $44,798.53 | Balance: $272.02 | BTC: 0.001442
+🕒 [13:09:38] ETH/USDT: $2,504.17 | Balance: $272.02 | ETH: 1.722102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:09:39] ADA/USDT: $0.48 | Balance: $272.02 | ADA: 0.000000
+🕒 [13:09:39] SOL/USDT: $107.11 | Balance: $272.02 | SOL: 0.000000
+🕒 [13:09:39] DOGE/USDT: $0.08 | Balance: $272.02 | DOGE: 0.000000
+🕒 [13:09:54] BTC/USDT: $44,812.15 | Balance: $272.02 | BTC: 0.001442
+🕒 [13:09:55] ETH/USDT: $2,504.65 | Balance: $272.02 | ETH: 1.722102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:09:55] ADA/USDT: $0.48 | Balance: $272.02 | ADA: 0.000000
+🕒 [13:09:55] SOL/USDT: $107.14 | Balance: $272.02 | SOL: 0.000000
+🕒 [13:09:55] DOGE/USDT: $0.08 | Balance: $272.02 | DOGE: 0.000000
+🕒 [13:10:11] BTC/USDT: $44,811.24 | Balance: $272.02 | BTC: 0.001442
+🕒 [13:10:11] ETH/USDT: $2,503.86 | Balance: $272.02 | ETH: 1.722102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:10:12] ADA/USDT: $0.48 | Balance: $272.02 | ADA: 0.000000
+🕒 [13:10:12] SOL/USDT: $107.04 | Balance: $272.02 | SOL: 0.000000
+🕒 [13:10:12] DOGE/USDT: $0.08 | Balance: $272.02 | DOGE: 0.000000
+🕒 [13:10:27] BTC/USDT: $44,829.53 | Balance: $272.02 | BTC: 0.001442
+🕒 [13:10:27] ETH/USDT: $2,504.06 | Balance: $272.02 | ETH: 1.722102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,504.06 | Amount: 2.00 USDT | Balance: $272.02 -> $270.03
+🕒 [13:10:28] ADA/USDT: $0.48 | Balance: $270.03 | ADA: 0.000000
+🕒 [13:10:28] SOL/USDT: $106.90 | Balance: $270.03 | SOL: 0.000000
+🕒 [13:10:28] DOGE/USDT: $0.08 | Balance: $270.03 | DOGE: 0.000000
+🕒 [13:10:43] BTC/USDT: $44,850.65 | Balance: $270.03 | BTC: 0.001442
+🕒 [13:10:44] ETH/USDT: $2,504.06 | Balance: $270.03 | ETH: 1.722901
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:10:44] ADA/USDT: $0.48 | Balance: $270.03 | ADA: 0.000000
+🕒 [13:10:44] SOL/USDT: $107.07 | Balance: $270.03 | SOL: 0.000000
+🕒 [13:10:44] DOGE/USDT: $0.08 | Balance: $270.03 | DOGE: 0.000000
+🕒 [13:11:00] BTC/USDT: $44,829.12 | Balance: $270.03 | BTC: 0.001442
+🕒 [13:11:00] ETH/USDT: $2,502.95 | Balance: $270.03 | ETH: 1.722901
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:11:01] ADA/USDT: $0.48 | Balance: $270.03 | ADA: 0.000000
+🕒 [13:11:01] SOL/USDT: $107.21 | Balance: $270.03 | SOL: 0.000000
+🕒 [13:11:01] DOGE/USDT: $0.08 | Balance: $270.03 | DOGE: 0.000000
+🕒 [13:11:16] BTC/USDT: $44,820.57 | Balance: $270.03 | BTC: 0.001442
+🕒 [13:11:16] ETH/USDT: $2,502.01 | Balance: $270.03 | ETH: 1.722901
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:11:17] ADA/USDT: $0.48 | Balance: $270.03 | ADA: 0.000000
+🕒 [13:11:17] SOL/USDT: $107.29 | Balance: $270.03 | SOL: 0.000000
+🕒 [13:11:17] DOGE/USDT: $0.08 | Balance: $270.03 | DOGE: 0.000000
+🕒 [13:11:32] BTC/USDT: $44,837.81 | Balance: $270.03 | BTC: 0.001442
+🕒 [13:11:32] ETH/USDT: $2,500.29 | Balance: $270.03 | ETH: 1.722901
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:11:33] ADA/USDT: $0.48 | Balance: $270.03 | ADA: 0.000000
+🕒 [13:11:33] SOL/USDT: $107.35 | Balance: $270.03 | SOL: 0.000000
+🕒 [13:11:33] DOGE/USDT: $0.08 | Balance: $270.03 | DOGE: 0.000000
+🕒 [13:11:48] BTC/USDT: $44,818.31 | Balance: $270.03 | BTC: 0.001442
+🕒 [13:11:48] ETH/USDT: $2,500.34 | Balance: $270.03 | ETH: 1.722901
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,500.34 | Amount: 2.00 USDT | Balance: $270.03 -> $268.03
+🕒 [13:11:49] ADA/USDT: $0.48 | Balance: $268.03 | ADA: 0.000000
+🕒 [13:11:49] SOL/USDT: $107.42 | Balance: $268.03 | SOL: 0.000000
+🕒 [13:11:49] DOGE/USDT: $0.08 | Balance: $268.03 | DOGE: 0.000000
+🕒 [13:12:04] BTC/USDT: $44,832.11 | Balance: $268.03 | BTC: 0.001442
+🕒 [13:12:04] ETH/USDT: $2,499.81 | Balance: $268.03 | ETH: 1.723701
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:12:04] ADA/USDT: $0.48 | Balance: $268.03 | ADA: 0.000000
+🕒 [13:12:04] SOL/USDT: $107.55 | Balance: $268.03 | SOL: 0.000000
+🕒 [13:12:04] DOGE/USDT: $0.08 | Balance: $268.03 | DOGE: 0.000000
+🕒 [13:12:20] BTC/USDT: $44,821.77 | Balance: $268.03 | BTC: 0.001442
+🕒 [13:12:20] ETH/USDT: $2,499.82 | Balance: $268.03 | ETH: 1.723701
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:12:20] ADA/USDT: $0.48 | Balance: $268.03 | ADA: 0.000000
+🕒 [13:12:20] SOL/USDT: $107.55 | Balance: $268.03 | SOL: 0.000000
+🕒 [13:12:20] DOGE/USDT: $0.08 | Balance: $268.03 | DOGE: 0.000000
+🕒 [13:12:35] BTC/USDT: $44,814.76 | Balance: $268.03 | BTC: 0.001442
+🕒 [13:12:36] ETH/USDT: $2,498.26 | Balance: $268.03 | ETH: 1.723701
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:12:36] ADA/USDT: $0.48 | Balance: $268.03 | ADA: 0.000000
+🕒 [13:12:36] SOL/USDT: $107.48 | Balance: $268.03 | SOL: 0.000000
+🕒 [13:12:36] DOGE/USDT: $0.08 | Balance: $268.03 | DOGE: 0.000000
+🕒 [13:12:51] BTC/USDT: $44,802.11 | Balance: $268.03 | BTC: 0.001442
+🕒 [13:12:52] ETH/USDT: $2,497.06 | Balance: $268.03 | ETH: 1.723701
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:12:52] ADA/USDT: $0.48 | Balance: $268.03 | ADA: 0.000000
+🕒 [13:12:52] SOL/USDT: $107.43 | Balance: $268.03 | SOL: 0.000000
+🕒 [13:12:52] DOGE/USDT: $0.08 | Balance: $268.03 | DOGE: 0.000000
+🕒 [13:13:07] BTC/USDT: $44,796.21 | Balance: $268.03 | BTC: 0.001442
+🕒 [13:13:07] ETH/USDT: $2,496.08 | Balance: $268.03 | ETH: 1.723701
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,496.08 | Amount: 2.00 USDT | Balance: $268.03 -> $266.02
+🕒 [13:13:08] ADA/USDT: $0.48 | Balance: $266.02 | ADA: 0.000000
+🕒 [13:13:08] SOL/USDT: $107.33 | Balance: $266.02 | SOL: 0.000000
+🕒 [13:13:08] DOGE/USDT: $0.08 | Balance: $266.02 | DOGE: 0.000000
+🕒 [13:13:23] BTC/USDT: $44,818.55 | Balance: $266.02 | BTC: 0.001442
+🕒 [13:13:23] ETH/USDT: $2,498.58 | Balance: $266.02 | ETH: 1.724502
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:13:24] ADA/USDT: $0.48 | Balance: $266.02 | ADA: 0.000000
+🕒 [13:13:24] SOL/USDT: $107.39 | Balance: $266.02 | SOL: 0.000000
+🕒 [13:13:24] DOGE/USDT: $0.08 | Balance: $266.02 | DOGE: 0.000000
+🕒 [13:13:39] BTC/USDT: $44,829.79 | Balance: $266.02 | BTC: 0.001442
+🕒 [13:13:39] ETH/USDT: $2,499.93 | Balance: $266.02 | ETH: 1.724502
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:13:40] ADA/USDT: $0.48 | Balance: $266.02 | ADA: 0.000000
+🕒 [13:13:40] SOL/USDT: $107.37 | Balance: $266.02 | SOL: 0.000000
+🕒 [13:13:40] DOGE/USDT: $0.08 | Balance: $266.02 | DOGE: 0.000000
+🕒 [13:13:55] BTC/USDT: $44,830.82 | Balance: $266.02 | BTC: 0.001442
+🕒 [13:13:55] ETH/USDT: $2,498.38 | Balance: $266.02 | ETH: 1.724502
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:13:56] ADA/USDT: $0.48 | Balance: $266.02 | ADA: 0.000000
+🕒 [13:13:56] SOL/USDT: $107.37 | Balance: $266.02 | SOL: 0.000000
+🕒 [13:13:56] DOGE/USDT: $0.08 | Balance: $266.02 | DOGE: 0.000000
+🕒 [13:14:11] BTC/USDT: $44,848.11 | Balance: $266.02 | BTC: 0.001442
+🕒 [13:14:11] ETH/USDT: $2,499.68 | Balance: $266.02 | ETH: 1.724502
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:14:12] ADA/USDT: $0.48 | Balance: $266.02 | ADA: 0.000000
+🕒 [13:14:12] SOL/USDT: $107.29 | Balance: $266.02 | SOL: 0.000000
+🕒 [13:14:12] DOGE/USDT: $0.08 | Balance: $266.02 | DOGE: 0.000000
+🕒 [13:14:27] BTC/USDT: $44,853.15 | Balance: $266.02 | BTC: 0.001442
+🕒 [13:14:27] ETH/USDT: $2,499.62 | Balance: $266.02 | ETH: 1.724502
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,499.62 | Amount: 2.00 USDT | Balance: $266.02 -> $264.02
+🕒 [13:14:28] ADA/USDT: $0.48 | Balance: $264.02 | ADA: 0.000000
+🕒 [13:14:28] SOL/USDT: $107.42 | Balance: $264.02 | SOL: 0.000000
+🕒 [13:14:28] DOGE/USDT: $0.08 | Balance: $264.02 | DOGE: 0.000000
+🕒 [13:14:43] BTC/USDT: $44,833.89 | Balance: $264.02 | BTC: 0.001442
+🕒 [13:14:43] ETH/USDT: $2,501.72 | Balance: $264.02 | ETH: 1.725302
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:14:44] ADA/USDT: $0.48 | Balance: $264.02 | ADA: 0.000000
+🕒 [13:14:44] SOL/USDT: $107.47 | Balance: $264.02 | SOL: 0.000000
+🕒 [13:14:44] DOGE/USDT: $0.08 | Balance: $264.02 | DOGE: 0.000000
+🕒 [13:14:59] BTC/USDT: $44,847.64 | Balance: $264.02 | BTC: 0.001442
+🕒 [13:14:59] ETH/USDT: $2,499.94 | Balance: $264.02 | ETH: 1.725302
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:15:00] ADA/USDT: $0.48 | Balance: $264.02 | ADA: 0.000000
+🕒 [13:15:00] SOL/USDT: $107.38 | Balance: $264.02 | SOL: 0.000000
+🕒 [13:15:00] DOGE/USDT: $0.08 | Balance: $264.02 | DOGE: 0.000000
+🕒 [13:15:15] BTC/USDT: $44,865.83 | Balance: $264.02 | BTC: 0.001442
+🕒 [13:15:15] ETH/USDT: $2,498.22 | Balance: $264.02 | ETH: 1.725302
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:15:16] ADA/USDT: $0.48 | Balance: $264.02 | ADA: 0.000000
+🕒 [13:15:16] SOL/USDT: $107.35 | Balance: $264.02 | SOL: 0.000000
+🕒 [13:15:16] DOGE/USDT: $0.08 | Balance: $264.02 | DOGE: 0.000000
+🕒 [13:15:31] BTC/USDT: $44,880.50 | Balance: $264.02 | BTC: 0.001442
+🕒 [13:15:31] ETH/USDT: $2,497.49 | Balance: $264.02 | ETH: 1.725302
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:15:32] ADA/USDT: $0.48 | Balance: $264.02 | ADA: 0.000000
+🕒 [13:15:32] SOL/USDT: $107.41 | Balance: $264.02 | SOL: 0.000000
+🕒 [13:15:32] DOGE/USDT: $0.08 | Balance: $264.02 | DOGE: 0.000000
+🕒 [13:15:47] BTC/USDT: $44,879.15 | Balance: $264.02 | BTC: 0.001442
+🕒 [13:15:48] ETH/USDT: $2,499.40 | Balance: $264.02 | ETH: 1.725302
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,499.40 | Amount: 2.00 USDT | Balance: $264.02 -> $262.02
+🕒 [13:15:48] ADA/USDT: $0.48 | Balance: $262.02 | ADA: 0.000000
+🕒 [13:15:48] SOL/USDT: $107.45 | Balance: $262.02 | SOL: 0.000000
+🕒 [13:15:48] DOGE/USDT: $0.08 | Balance: $262.02 | DOGE: 0.000000
+🕒 [13:16:03] BTC/USDT: $44,871.23 | Balance: $262.02 | BTC: 0.001442
+🕒 [13:16:04] ETH/USDT: $2,498.04 | Balance: $262.02 | ETH: 1.726102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:16:04] ADA/USDT: $0.48 | Balance: $262.02 | ADA: 0.000000
+🕒 [13:16:04] SOL/USDT: $107.43 | Balance: $262.02 | SOL: 0.000000
+🕒 [13:16:04] DOGE/USDT: $0.08 | Balance: $262.02 | DOGE: 0.000000
+🕒 [13:16:19] BTC/USDT: $44,890.68 | Balance: $262.02 | BTC: 0.001442
+🕒 [13:16:20] ETH/USDT: $2,500.03 | Balance: $262.02 | ETH: 1.726102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:16:20] ADA/USDT: $0.48 | Balance: $262.02 | ADA: 0.000000
+🕒 [13:16:20] SOL/USDT: $107.32 | Balance: $262.02 | SOL: 0.000000
+🕒 [13:16:20] DOGE/USDT: $0.08 | Balance: $262.02 | DOGE: 0.000000
+🕒 [13:16:35] BTC/USDT: $44,873.71 | Balance: $262.02 | BTC: 0.001442
+🕒 [13:16:36] ETH/USDT: $2,499.34 | Balance: $262.02 | ETH: 1.726102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:16:36] ADA/USDT: $0.48 | Balance: $262.02 | ADA: 0.000000
+🕒 [13:16:36] SOL/USDT: $107.20 | Balance: $262.02 | SOL: 0.000000
+🕒 [13:16:36] DOGE/USDT: $0.08 | Balance: $262.02 | DOGE: 0.000000
+🕒 [13:16:51] BTC/USDT: $44,885.21 | Balance: $262.02 | BTC: 0.001442
+🕒 [13:16:52] ETH/USDT: $2,497.67 | Balance: $262.02 | ETH: 1.726102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+🕒 [13:16:52] ADA/USDT: $0.48 | Balance: $262.02 | ADA: 0.000000
+🕒 [13:16:52] SOL/USDT: $107.29 | Balance: $262.02 | SOL: 0.000000
+🕒 [13:16:52] DOGE/USDT: $0.08 | Balance: $262.02 | DOGE: 0.000000
+🕒 [13:17:07] BTC/USDT: $44,869.57 | Balance: $262.02 | BTC: 0.001442
+🕒 [13:17:07] ETH/USDT: $2,496.06 | Balance: $262.02 | ETH: 1.726102
+🌐 Market Regime: RANGE (Strictness: NORMAL)
+📝 MLEvaluator: Logging event for ETH - Action: EXECUTED
+📊 BUY ETH | Price: $2,496.06 | Amount: 2.00 USDT | Balance: $262.02 -> $260.02
+🕒 [13:17:08] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:17:08] SOL/USDT: $107.38 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:17:08] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:17:23] BTC/USDT: $44,891.02 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:17:23] ETH/USDT: $2,498.06 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:17:24] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:17:24] SOL/USDT: $107.43 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:17:24] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:17:39] BTC/USDT: $44,901.27 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:17:39] ETH/USDT: $2,497.54 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:17:40] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:17:40] SOL/USDT: $107.60 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:17:40] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:17:55] BTC/USDT: $44,887.16 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:17:55] ETH/USDT: $2,496.35 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:17:56] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:17:56] SOL/USDT: $107.65 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:17:56] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:18:11] BTC/USDT: $44,869.00 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:18:12] ETH/USDT: $2,497.46 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:18:12] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:18:12] SOL/USDT: $107.86 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:18:12] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:18:27] BTC/USDT: $44,849.41 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:18:28] ETH/USDT: $2,498.83 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:18:29] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:18:29] SOL/USDT: $108.00 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:18:29] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:18:44] BTC/USDT: $44,865.09 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:18:44] ETH/USDT: $2,498.69 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:18:45] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:18:45] SOL/USDT: $107.89 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:18:45] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:19:00] BTC/USDT: $44,853.05 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:19:01] ETH/USDT: $2,498.20 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:19:02] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:19:02] SOL/USDT: $107.70 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:19:02] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:19:17] BTC/USDT: $44,855.31 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:19:17] ETH/USDT: $2,496.69 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:19:18] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:19:18] SOL/USDT: $107.89 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:19:18] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:19:33] BTC/USDT: $44,835.03 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:19:33] ETH/USDT: $2,496.26 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:19:35] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:19:35] SOL/USDT: $108.07 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:19:35] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:19:50] BTC/USDT: $44,835.39 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:19:50] ETH/USDT: $2,496.78 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:19:51] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:19:51] SOL/USDT: $107.90 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:19:51] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:20:06] BTC/USDT: $44,816.31 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:20:06] ETH/USDT: $2,498.04 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:20:08] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:20:08] SOL/USDT: $108.12 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:20:08] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:20:23] BTC/USDT: $44,835.63 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:20:24] ETH/USDT: $2,498.48 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:20:24] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:20:24] SOL/USDT: $107.97 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:20:24] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:20:39] BTC/USDT: $44,849.26 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:20:40] ETH/USDT: $2,499.57 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:20:40] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:20:40] SOL/USDT: $107.81 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:20:40] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:20:55] BTC/USDT: $44,832.11 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:20:56] ETH/USDT: $2,499.42 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:20:58] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:20:58] SOL/USDT: $107.96 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:20:58] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:21:13] BTC/USDT: $44,827.60 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:21:13] ETH/USDT: $2,498.81 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:21:15] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:21:15] SOL/USDT: $108.00 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:21:15] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:21:30] BTC/USDT: $44,818.11 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:21:30] ETH/USDT: $2,499.76 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:21:31] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:21:31] SOL/USDT: $107.84 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:21:31] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:21:46] BTC/USDT: $44,805.16 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:21:46] ETH/USDT: $2,497.94 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:21:47] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:21:47] SOL/USDT: $107.69 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:21:47] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:22:02] BTC/USDT: $44,786.32 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:22:02] ETH/USDT: $2,498.67 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:22:03] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:22:03] SOL/USDT: $107.70 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:22:03] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:22:18] BTC/USDT: $44,802.95 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:22:18] ETH/USDT: $2,496.73 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:22:19] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:22:19] SOL/USDT: $107.77 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:22:19] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:22:34] BTC/USDT: $44,822.96 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:22:34] ETH/USDT: $2,496.07 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:22:35] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:22:35] SOL/USDT: $107.76 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:22:35] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:22:50] BTC/USDT: $44,816.09 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:22:50] ETH/USDT: $2,495.90 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:22:51] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:22:51] SOL/USDT: $107.89 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:22:51] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:23:06] BTC/USDT: $44,815.97 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:23:06] ETH/USDT: $2,496.59 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:23:07] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:23:07] SOL/USDT: $108.10 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:23:07] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:23:22] BTC/USDT: $44,823.28 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:23:22] ETH/USDT: $2,496.54 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:23:23] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:23:23] SOL/USDT: $108.02 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:23:23] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:23:38] BTC/USDT: $44,820.13 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:23:39] ETH/USDT: $2,494.90 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:23:39] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:23:39] SOL/USDT: $107.85 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:23:39] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:23:54] BTC/USDT: $44,818.77 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:23:55] ETH/USDT: $2,495.63 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:23:55] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:23:55] SOL/USDT: $107.96 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:23:55] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:24:10] BTC/USDT: $44,833.78 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:24:11] ETH/USDT: $2,497.32 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:24:11] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:24:11] SOL/USDT: $108.03 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:24:11] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000
+🕒 [13:24:26] BTC/USDT: $44,843.89 | Balance: $260.02 | BTC: 0.001442
+🕒 [13:24:27] ETH/USDT: $2,495.64 | Balance: $260.02 | ETH: 1.726904
+🌐 Market Regime: TREND_DOWN (Strictness: NORMAL)
+🧠 ML Filter: BUY blocked - TREND_DOWN with low confidence (0.50 < 0.55)
+📝 MLEvaluator: Logging event for ETH - Action: BLOCKED_BY_ML
+🕒 [13:24:28] ADA/USDT: $0.48 | Balance: $260.02 | ADA: 0.000000
+🕒 [13:24:28] SOL/USDT: $108.03 | Balance: $260.02 | SOL: 0.000000
+🕒 [13:24:28] DOGE/USDT: $0.08 | Balance: $260.02 | DOGE: 0.000000

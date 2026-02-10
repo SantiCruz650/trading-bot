@@ -6,5 +6,5 @@ fastapi
 uvicorn
 requests
 vaderSentiment
-tensorflow-cpu
+
 xgboost

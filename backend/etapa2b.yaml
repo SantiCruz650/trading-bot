@@ -1,0 +1,17 @@
+ar_dca:
+  base_multiplier: 1.0
+  max_multiplier: 3.0
+  min_multiplier: 0.1
+  min_dca_interval_seconds: 180
+
+rotation:
+  min_shs_to_trade: 45
+  update_interval_minutes: 60
+
+risk_governor:
+  global_dd_limit: 0.12
+  emergency_freeze_limit: 0.18
+
+ml_thresholds:
+  min_confidence: 0.55
+  trend_sensitivity: 0.7
