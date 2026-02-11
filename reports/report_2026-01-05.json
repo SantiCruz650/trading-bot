@@ -1,0 +1,57 @@
+{
+    "date": "2026-01-05",
+    "total_trades_today": 0,
+    "assets_traded": [],
+    "total_bought_today": 0,
+    "total_sold_today": 0,
+    "current_balance": 1000.0,
+    "balance_start_of_day": -179.0,
+    "daily_cash_flow": 1179.0,
+    "portfolio": {
+        "BTC": {
+            "amount": 0.0014418114442005167,
+            "value_usdt": 65.08692141439738,
+            "last_price": 45142.46413856704
+        },
+        "ETH": {
+            "amount": 0.44290172483327805,
+            "value_usdt": 1108.5309759246434,
+            "last_price": 2502.8824991411557
+        }
+    },
+    "total_portfolio_value": 2173.6178973390406,
+    "total_pnl_usdt": 1173.6178973390406,
+    "total_pnl_pct": 117.36178973390406,
+    "daily_trades": [],
+    "daily_pnl": 0,
+    "eth_accumulated": 0.442902,
+    "daily_max_drawdown_pct": 0,
+    "bot_status": "ACTIVE",
+    "max_drawdown_pct": 8.52,
+    "total_cycles": 328,
+    "win_rate_pct": 0,
+    "profit_factor": 0,
+    "avg_time_between_trades_sec": 700.23,
+    "equity_curve": [
+        932.53,
+        931.33,
+        931.87,
+        932.19,
+        930.88,
+        929.86,
+        930.41,
+        928.83,
+        928.32,
+        927.45,
+        928.74,
+        931.53,
+        931.74,
+        930.79,
+        930.78,
+        931.83,
+        932.58,
+        931.11,
+        933.1,
+        933.14
+    ]
+}

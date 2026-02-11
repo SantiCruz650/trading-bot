@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Buttons</title>
+    <script src="config_runtime.js"></script>
+</head>
+<body>
+    <h1>API Test Buttons</h1>
+    
+    <h2>Authentication</h2>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testRegister()">Test Register</button>
+    <div id="auth-result"></div>
+    
+    <h2>Predictions</h2>
+    <label>Ticker: 
+        <select id="ticker-select">
+            <option>BTC</option>
+            <option>ETH</option>
+            <option>ADA</option>
+            <option>SOL</option>
+            <option>DOGE</option>
+        </select>
+    </label>
+    <button onclick="testPredict()">Get AI Signal</button>
+    <button onclick="testBacktest()">Run Backtest</button>
+    <button onclick="testHistory()">Get Prediction History</button>
+    <div id="prediction-result"></div>
+    
+    <script>
+        let token = null;
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${window.API_URL}/auth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'username=testuser&password=testpass123'
+                });
+                
+                const data = await response.json();
+                if (data.access_token) {
+                    token = data.access_token;
+                    document.getElementById('auth-result').innerHTML = `
+                        ✓ Logged in successfully<br>
+                        Token: ${token.substring(0, 20)}...
+                    `;
+                } else {
+                    document.getElementById('auth-result').innerHTML = `✗ Login failed: ${JSON.stringify(data)}`;
+                }
+            } catch (error) {
+                document.getElementById('auth-result').innerHTML = `✗ Error: ${error.message}`;
+            }
+        }
+        
+        async function testPredict() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const ticker = document.getElementById('ticker-select').value;
+                const response = await fetch(`${window.API_URL}/predictions/predict/${ticker}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('prediction-result').innerHTML = `
+                    <h3>Prediction Result:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('prediction-result').innerHTML = `✗ Error: ${error.message}`;
+            }
+        }
+        
+        async function testBacktest() {
+            try {
+                const ticker = document.getElementById('ticker-select').value;
+                const response = await fetch(`${window.ML_API_URL}/backtest/${ticker}?days=100`);
+                
+                const data = await response.json();
+                document.getElementById('prediction-result').innerHTML = `
+                    <h3>Backtest Result:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('prediction-result').innerHTML = `✗ Error: ${error.message}`;
+            }
+        }
+        
+        async function testHistory() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${window.API_URL}/predictions/my-predictions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('prediction-result').innerHTML = `
+                    <h3>Prediction History:</h3>
+                    <p>Total predictions: ${data.length}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('prediction-result').innerHTML = `✗ Error: ${error.message}`;
+            }
+        }
+        
+        async function testRegister() {
+            try {
+                const response = await fetch(`${window.API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser2',
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('auth-result').innerHTML = `✓ Register response: ${JSON.stringify(data)}`;
+            } catch (error) {
+                document.getElementById('auth-result').innerHTML = `✗ Error: ${error.message}`;
+            }
+        }
+        
+        // Auto-login on load
+        window.onload = () => {
+            console.log('API_URL:', window.API_URL);
+            console.log('ML_API_URL:', window.ML_API_URL);
+            testLogin();
+        };
+    </script>
+    
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        button { margin: 5px; padding: 8px 15px; cursor: pointer; }
+        #prediction-result { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</body>
+</html>

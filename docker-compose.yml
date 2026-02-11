@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: trading-bot-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ML_SERVICE_URL=http://ml_service:8001
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+    volumes:
+      - ./backend:/app
+      - ./frontend:/frontend
+    depends_on:
+      - ml_service
+    networks:
+      - trading-network
+
+  ml_service:
+    build: ./ml_service
+    container_name: trading-bot-ml-service
+    ports:
+      - "8001:8001"
+    environment:
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+    volumes:
+      - ./ml_service:/app
+    networks:
+      - trading-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: trading-bot-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - trading-network
+
+  worker:
+    build: ./backend
+    container_name: trading-bot-worker
+    command: celery -A app.worker.celery worker --loglevel=info
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - ML_SERVICE_URL=http://ml_service:8001
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+      - redis
+    networks:
+      - trading-network
+
+networks:
+  trading-network:
+    driver: bridge

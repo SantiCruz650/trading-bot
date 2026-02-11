@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCrypto v2 | Professional Trading Intelligence</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="dark-theme">
+    <nav class="navbar">
+        <div class="logo">MCRYPTO <span class="v2-badge">v2</span></div>
+        <div class="status-indicators">
+            <div id="connection-status" class="status-item">
+                <span class="dot"></span> Backend: <span class="status-text">Conectando...</span>
+            </div>
+            <div id="system-state" class="status-item">
+                <span class="dot"></span> Estado: <span class="status-text">Cargando...</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <main class="dashboard-grid">
+        <!-- Capital Overview -->
+        <section class="card stats-overview" id="equity-section">
+            <h2>Resumen de Capital</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <label>Equity Estimada</label>
+                    <div id="equity-value" class="value">--- USDT</div>
+                </div>
+                <div id="daily-pnl-container" class="stat-item">
+                    <label>PnL Diario</label>
+                    <div id="daily-pnl" class="value">---</div>
+                </div>
+                <div class="stat-item">
+                    <label>Drawdown Actual</label>
+                    <div id="current-drawdown" class="value">---%</div>
+                </div>
+                <div class="stat-item">
+                    <label>Efectivo (USDT)</label>
+                    <div id="usdt-balance" class="value">---</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk & Governance -->
+        <section class="card risk-governance" id="risk-section">
+            <h2>Gobernanza de Riesgo</h2>
+            <div id="risk-governor-display" class="risk-display">
+                <div class="risk-mode" id="gov-mode">NORMAL</div>
+                <div class="exposure-bar-container">
+                    <label>Exposición Global (ER)</label>
+                    <div class="progress-bg">
+                        <div id="er-bar" class="progress-fill"></div>
+                    </div>
+                </div>
+                <div id="risk-details" class="details-list">
+                    <!-- Dynamic details -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Active Market -->
+        <section class="card active-trading" id="market-section">
+            <h2>Mercado Activo (ETH/USDT)</h2>
+            <div class="market-hero">
+                <div id="eth-price" class="hero-price">$0.00</div>
+                <div id="market-regime" class="regime-tag">---</div>
+            </div>
+            <div class="ml-insights">
+                <h3>ML Insights</h3>
+                <div class="ml-grid">
+                    <div class="ml-item">
+                        <label>Confianza</label>
+                        <div id="ml-confidence" class="ml-val">---</div>
+                    </div>
+                    <div class="ml-item">
+                        <label>SHS</label>
+                        <div id="shs-score" class="ml-val">---</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Control Panel -->
+        <section class="card control-panel" id="control-section">
+            <h2>Panel de Control</h2>
+            <div class="control-grid">
+                <button id="btn-start" class="btn btn-emerald">START BOT</button>
+                <button id="btn-stop" class="btn btn-slate">STOP BOT</button>
+                <button id="btn-kill" class="btn btn-danger">EMERGENCY KILL</button>
+            </div>
+            <div class="mode-toggle">
+                <label>Modo de Operación</label>
+                <div class="toggle-group">
+                    <button id="mode-normal" class="btn-toggle active">Normal</button>
+                    <button id="mode-conservative" class="btn-toggle">Conservador</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="card activity-log" id="activity-section">
+            <h2>Actividad Reciente</h2>
+            <div id="trades-list" class="scroll-container">
+                <p class="placeholder-text">Esperando datos de ejecución...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="system-footer">
+        <p>MCrypto Trading Engine • Etapa 3 <span id="last-update">---</span></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+pandas
+yfinance
+scikit-learn
+numpy
+fastapi
+uvicorn
+requests
+vaderSentiment
+
+xgboost

@@ -1,0 +1,6 @@
+authtoken: 35Fz1ygw4l2VYlgkXqENxW9XugB_AeqhxXgccwGZNbNt5jpW
+version: "2"
+tunnels:
+    bot:
+        proto: http
+        addr: 8000
