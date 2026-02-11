@@ -1,0 +1,18 @@
+# Etapa 2B - Configuration for Adaptive Engines
+ar_dca:
+  enabled: true
+  min_dca_interval_seconds: 180
+  volatility_weight: 0.3
+  ml_confidence_weight: 0.5
+  trend_strength_weight: 0.2
+
+rotation:
+  enabled: true
+  min_health_score: 0.6
+  max_portfolio_slots: 5
+
+risk_governor:
+  enabled: true
+  max_global_drawdown: 0.05
+  protective_mode_threshold: 0.03
+  emergency_freeze_threshold: 0.05
