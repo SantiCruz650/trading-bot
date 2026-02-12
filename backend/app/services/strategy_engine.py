@@ -3,6 +3,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from app.models.models import Strategy, StrategyExecution, PaperTrade
 from datetime import datetime, timedelta
 import json
+from pathlib import Path
 import httpx
 
 class StrategyEngine:
