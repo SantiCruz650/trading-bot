@@ -13,3 +13,4 @@ requests
 httpx
 aiohttp
 PyYAML
+email-validator==2.1.0.post1
