@@ -6,8 +6,7 @@ import json
 import httpx
 
 class StrategyEngine:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self):
         # ETAPA 2A - Risk Manager
         from app.services.risk_manager import RiskManager
         self.risk_manager = RiskManager(bankroll=1000.0)  # Will be updated dynamically
@@ -18,38 +17,46 @@ class StrategyEngine:
         from app.core.risk_governor import RiskGovernor
         import yaml
         
-        config_path = "/home/santiagomiguelcruz/trading-bot/backend/etapa2b.yaml"
+        config_path = Path(__file__).resolve().parent.parent.parent / "etapa2b.yaml"
+        # Fallback for different deployment structures
+        if not config_path.exists():
+             config_path = Path(__file__).resolve().parent.parent / "etapa2b.yaml"
+             
         with open(config_path, 'r') as f:
             self.config_2b = yaml.safe_load(f)
             
         self.ar_dca_engine = ARDCAEngine(self.config_2b.get("ar_dca", {}))
         self.rotation_engine = RotationEngine(self.config_2b.get("rotation", {}))
         self.risk_governor = RiskGovernor(self.config_2b.get("risk_governor", {}))
+        print("🤖 Strategy Engine Initialized (Persistent State)")
 
-    def evaluate_strategies(self, ticker: str, current_price: float):
+    def evaluate_strategies(self, ticker: str, current_price: float, db: Session):
         """Check all active strategies for this ticker and execute if needed."""
         # 0. Check Kill Switch
         if self.risk_governor.risk_manager.kill_switch_active:
             print(f"🛑 KILL SWITCH ACTIVE: Strategy evaluation HALTED for {ticker}")
             return
             
-        strategies = self.db.query(Strategy).filter(
+        strategies = db.query(Strategy).filter(
             Strategy.ticker == ticker, 
             Strategy.status == "ACTIVE"
         ).all()
         
+        if strategies:
+            print(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
+        
         results = []
         for strategy in strategies:
             if strategy.type == "GRID":
-                res = self._evaluate_grid(strategy, current_price)
+                res = self._evaluate_grid(strategy, current_price, db)
             elif strategy.type == "DCA":
-                res = self._evaluate_dca(strategy, current_price)
+                res = self._evaluate_dca(strategy, current_price, db)
             
             if res:
                 results.append(res)
         return results
 
-    def _evaluate_dca(self, strategy, current_price):
+    def _evaluate_dca(self, strategy, current_price, db):
         """
         DCA Logic: 
         1. Sell if price >= avg_buy_price + 1.5% (Trailing Take Profit)
@@ -65,7 +72,7 @@ class StrategyEngine:
         
         amount_to_buy = params.get("amount", settings.BASE_TRADE_AMOUNT)
         # 1. Get current position stats
-        avg_price, total_eth, dca_levels = self._get_position_stats(strategy)
+        avg_price, total_eth, dca_levels = self._get_position_stats(strategy, db)
         current_balance = exchange.get_balance()
         
         # 1.1 Calculate Dynamic Position Size
@@ -97,7 +104,7 @@ class StrategyEngine:
             ml_metrics = {}
             
         # 2.2 Global Risk Governance
-        portfolio_stats = self._get_global_portfolio_stats()
+        portfolio_stats = self._get_global_portfolio_stats(db)
         global_state = self.risk_governor.evaluate_global_risk(
             total_equity=portfolio_stats["total_equity"],
             portfolio_ath=portfolio_stats["portfolio_ath"]
@@ -114,7 +121,7 @@ class StrategyEngine:
             can_buy = False # Will be used below
         
         # 2.4 Evaluate ML Performance
-        self._evaluate_ml_performance(strategy, current_price)
+        self._evaluate_ml_performance(strategy, current_price, db)
         
         # 3. Drawdown Guard & Market Regime Data
         price_history = params.get("price_history", [])
@@ -150,7 +157,7 @@ class StrategyEngine:
                     print(f"🚨 Drawdown detected ({drop_pct*100:.1f}%). Buying paused for 30m.")
                     strategy.params = params
                     flag_modified(strategy, "params")
-                    self.db.commit()
+                    db.commit()
                     return None
 
         # 4. Check Sell Condition (Trailing Take Profit)
@@ -187,13 +194,13 @@ class StrategyEngine:
                             strategy.params = params
                             flag_modified(strategy, "params")
                             # We commit before trade to ensure params are saved if trade fails
-                            self.db.commit()
+                            db.commit()
                             
                             if settings.OBSERVATION_ONLY:
                                 print(f"🔭 Observation Mode: SELL signal for {strategy.ticker} at ${current_price:,.2f} (No trade executed)")
                                 return None
                                 
-                            result = self._execute_trade(strategy, "SELL", eth_to_sell * current_price, current_price, avg_price)
+                            result = self._execute_trade(strategy, "SELL", eth_to_sell * current_price, current_price, db, avg_buy_price)
                             # Record cycle outcome
                             profitable = current_price > avg_price
                             self.risk_manager.record_cycle_outcome(profitable=profitable)
@@ -256,7 +263,7 @@ class StrategyEngine:
 
         if can_buy:
             # Get last BUY execution
-            last_buy = self.db.query(StrategyExecution).filter(
+            last_buy = db.query(StrategyExecution).filter(
                 StrategyExecution.strategy_id == strategy.id,
                 StrategyExecution.order_type == "BUY"
             ).order_by(StrategyExecution.timestamp.desc()).first()
@@ -308,7 +315,7 @@ class StrategyEngine:
                         params["last_observation_buy_log"] = now_iso
                         strategy.params = params
                         flag_modified(strategy, "params")
-                        self.db.commit()
+                        db.commit()
                     return None
                 
                 # Log for ML Evaluation
@@ -330,7 +337,7 @@ class StrategyEngine:
                     dca_levels=dca_levels
                 )
                     
-                return self._execute_trade(strategy, "BUY", amount_to_buy, current_price)
+                return self._execute_trade(strategy, "BUY", amount_to_buy, current_price, db)
         
         # If we reached here, either can_buy was False or should_buy was False
         # If it was blocked by ML (block_reason exists) and algo wanted to buy (balance >= 100)
@@ -355,7 +362,7 @@ class StrategyEngine:
         
         strategy.params = params
         flag_modified(strategy, "params")
-        self.db.commit()
+        db.commit()
         return None
 
     def _calculate_dynamic_size(self, strategy, current_price, current_balance, total_eth):
@@ -442,9 +449,9 @@ class StrategyEngine:
         else:
             return "RANGE"
 
-    def _get_position_stats(self, strategy):
+    def _get_position_stats(self, strategy, db):
         """Calculate average buy price, total ETH held, and DCA levels for this strategy."""
-        executions = self.db.query(StrategyExecution).filter(
+        executions = db.query(StrategyExecution).filter(
             StrategyExecution.strategy_id == strategy.id
         ).all()
         
@@ -474,7 +481,7 @@ class StrategyEngine:
         avg_price = total_cost / total_eth
         return avg_price, total_eth, dca_levels
 
-    def _log_ml_insight(self, strategy, current_price):
+    def _log_ml_insight(self, strategy, current_price, db): # Added db although not used yet to keep consistent
         """Fetch and log ML signal and record correlation."""
         ticker = strategy.ticker
         data = {"signal": "NEUTRAL", "regime": "UNKNOWN", "strictness": "NORMAL"}
@@ -495,7 +502,7 @@ class StrategyEngine:
                     # print(f"🧠 ML Insight {ticker}: {ml_signal} ({prob:.2f})")
                     
                     # Record for correlation
-                    log_path = "/home/santiagomiguelcruz/trading-bot/ml_correlation.log"
+                    log_path = Path(__file__).resolve().parent.parent.parent / "ml_correlation.log"
                     with open(log_path, "a") as f:
                         f.write(f"{datetime.utcnow().isoformat()} | {ticker} | {ml_signal} | {current_price:.2f}\n")
                         
@@ -510,13 +517,13 @@ class StrategyEngine:
                     params["pending_ml_evaluations"] = pending
                     strategy.params = params
                     flag_modified(strategy, "params")
-                    self.db.commit()
+                    db.commit()
         except Exception:
             # Silent fail for ML insight to maintain stability
             pass
         return data
 
-    def _evaluate_ml_performance(self, strategy, current_price):
+    def _evaluate_ml_performance(self, strategy, current_price, db):
         """Evaluate pending ML signals after 1 hour."""
         params = strategy.params or {}
         pending = params.get("pending_ml_evaluations", [])
@@ -524,7 +531,7 @@ class StrategyEngine:
             return
             
         now = datetime.utcnow()
-        eval_log_path = "/home/santiagomiguelcruz/trading-bot/ml_evaluation.log"
+        eval_log_path = Path(__file__).resolve().parent.parent.parent / "ml_evaluation.log"
         
         new_pending = []
         metrics = params.get("ml_metrics", {"tp": 0, "fp": 0, "tn": 0, "fn": 0, "total": 0})
@@ -575,9 +582,9 @@ class StrategyEngine:
             params["ml_metrics"] = metrics
             strategy.params = params
             flag_modified(strategy, "params")
-            self.db.commit()
+            db.commit()
 
-    def _evaluate_grid(self, strategy, current_price):
+    def _evaluate_grid(self, strategy, current_price, db):
         """
         Simple Grid Logic:
         Params: {"min_price": 50000, "max_price": 60000, "grids": 10, "amount_per_grid": 50}
@@ -587,7 +594,7 @@ class StrategyEngine:
         # This is a placeholder for the full implementation.
         return None
 
-    def _execute_trade(self, strategy, order_type, amount, price, avg_buy_price=None):
+    def _execute_trade(self, strategy, order_type, amount, price, db, avg_buy_price=None):
         from app.core.config import settings
         from app.services.exchange_service import get_exchange
         exchange = get_exchange(local_simulation=settings.OBSERVATION_ONLY)
@@ -623,7 +630,7 @@ class StrategyEngine:
             price=price,
             amount=amount
         )
-        self.db.add(execution)
+        db.add(execution)
         
         # 4. Create Paper Trade record
         trade = PaperTrade(
@@ -635,12 +642,12 @@ class StrategyEngine:
             pnl=(price - avg_buy_price) * (amount / price) if order_type.upper() == "SELL" and avg_buy_price else 0.0,
             owner_id=strategy.user_id
         )
-        self.db.add(trade)
-        self.db.commit()
+        db.add(trade)
+        db.commit()
         
         return f"Executed {order_type} for {strategy.ticker} at ${price:,.2f} (SIM)"
 
-    def _get_global_portfolio_stats(self):
+    def _get_global_portfolio_stats(self, db): # Added db for future use
         """Mock global portfolio stats for Risk Governor."""
         from app.core.config import settings
         from app.services.exchange_service import get_exchange

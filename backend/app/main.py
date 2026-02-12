@@ -69,7 +69,16 @@ import asyncio
 @app.on_event("startup")
 async def startup_event():
     print("DEBUG: Executing startup_event")
-    # Start REST polling in background (Replaces WebSocket)
+    
+    # Initialize Strategy Engine (Persistent State)
+    from app.services.strategy_engine import StrategyEngine
+    engine = StrategyEngine()
+    
+    # Inject Engine into PollingService
+    polling_service.engine = engine
+    print("📡 Strategy Engine integrated with Polling Service")
+    
+    # Start REST polling in background
     asyncio.create_task(polling_service.start())
     
     if os.getenv("HEADLESS_MODE") == "true" or True: # Always show in this local setup

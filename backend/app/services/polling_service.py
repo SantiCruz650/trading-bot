@@ -20,6 +20,7 @@ class PollingService:
         self.last_action = "STOP"
         self.killed = False
         self.active_mode = None
+        self.engine = None  # Will be injected at startup
 
     async def start(self, mode: str = "MOCK"):
         if self.killed:
@@ -78,10 +79,13 @@ class PollingService:
         logger.info("🛑 Polling Service stopped")
 
     def _run_strategy_engine(self, ticker, price):
+        if not self.engine:
+            logger.warning("⚠️ Strategy Engine not initialized yet in PollingService")
+            return
+            
         db = SessionLocal()
         try:
-            engine = StrategyEngine(db)
-            engine.evaluate_strategies(ticker, price)
+            self.engine.evaluate_strategies(ticker, price, db)
         except Exception as e:
             logger.error(f"Strategy Engine Error for {ticker}: {e}")
         finally:
