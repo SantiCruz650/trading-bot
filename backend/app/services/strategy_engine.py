@@ -46,6 +46,8 @@ class StrategyEngine:
         if strategies:
             print(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
         
+        # Explicitly log if no strategies found for ticker (optional for debugging, but let's stick to the requirement)
+        
         results = []
         for strategy in strategies:
             if strategy.type == "GRID":
@@ -605,7 +607,7 @@ class StrategyEngine:
         
         # For SELL, amount is USDT value to sell
         order = exchange.place_market_order(
-            symbol=f"{strategy.ticker}/USDT",
+            symbol=strategy.ticker, # Now already in "BTC/USDT" format
             side=order_type.lower(),
             amount=amount / price
         )

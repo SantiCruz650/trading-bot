@@ -54,7 +54,7 @@ class PollingService:
                         
                         # Get accumulated asset amount for this ticker
                         # We'll use a helper to get this from the database
-                        accumulated = self._get_accumulated(ticker_name)
+                        accumulated = self._get_accumulated(symbol)
                         
                         # Log the cycle
                         print(f"🕒 [{datetime.now().strftime('%H:%M:%S')}] {symbol}: ${price:,.2f} | Balance: ${balance:,.2f}")
@@ -62,7 +62,7 @@ class PollingService:
                             logger.info(f"🧪 [MOCK TICK] {symbol} @ {price:,.2f}")
                         
                         # Trigger Strategy Engine
-                        await asyncio.to_thread(self._run_strategy_engine, ticker_name, price)
+                        await asyncio.to_thread(self._run_strategy_engine, symbol, price)
                 
                 # Wait for the next interval
                 await asyncio.sleep(self.interval)

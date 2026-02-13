@@ -134,9 +134,7 @@ class ExchangeService:
         """Get current market price"""
         if self.local_simulation:
             # Use local simulator
-            # Ensure symbol format is correct (e.g. BTC/USDT)
-            if '/' not in symbol and 'USDT' in symbol:
-                symbol = symbol.replace('USDT', '/USDT')
+            # Expects symbol format (e.g. BTC/USDT)
             return market_simulator.get_price(symbol)
             
         try:

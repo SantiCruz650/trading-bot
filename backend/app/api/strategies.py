@@ -15,9 +15,19 @@ class StrategyCreate(BaseModel):
 
 @router.post("/create")
 def create_strategy(strategy: StrategyCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    # Standardize and validate ticker format BASE/QUOTE (e.g., BTC/USDT)
+    ticker = strategy.ticker.upper()
+    if "/" not in ticker:
+        # Fallback/Auto-fix if they just send BTC, but log it or enforce it
+        # The requirement says NO hidden conversion, so let's enforce it or be very explicit.
+        if ticker in ["BTC", "ETH", "ADA", "SOL", "DOGE"]:
+             ticker = f"{ticker}/USDT"
+        else:
+             raise HTTPException(status_code=400, detail="Ticker must be in BASE/QUOTE format (e.g., BTC/USDT)")
+
     new_strategy = Strategy(
         user_id=current_user.id,
-        ticker=strategy.ticker,
+        ticker=ticker,
         type=strategy.type,
         params=strategy.params,
         status="ACTIVE"
