@@ -4,9 +4,10 @@
  */
 
 // Dynamic API detection: Use env variable or fallback to current host
-const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? "http://localhost:8000/api"
-    : "/api"; // In production, netlify redirects /api to backend
+const API_BASE =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? "http://localhost:8000/api"
+        : "https://trading-bot-kea3.onrender.com/api";
 
 const UPDATE_INTERVAL = 15000;
 
