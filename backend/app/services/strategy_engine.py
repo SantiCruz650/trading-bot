@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 import json
 from pathlib import Path
 import httpx
+import logging
+
+logger = logging.getLogger(__name__)
 
 class StrategyEngine:
     def __init__(self):
@@ -29,13 +32,13 @@ class StrategyEngine:
         self.ar_dca_engine = ARDCAEngine(self.config_2b.get("ar_dca", {}))
         self.rotation_engine = RotationEngine(self.config_2b.get("rotation", {}))
         self.risk_governor = RiskGovernor(self.config_2b.get("risk_governor", {}))
-        print("🤖 Strategy Engine Initialized (Persistent State)")
+        logger.info("🤖 Strategy Engine Initialized (Persistent State)")
 
     def evaluate_strategies(self, ticker: str, current_price: float, db: Session):
         """Check all active strategies for this ticker and execute if needed."""
         # 0. Check Kill Switch
         if self.risk_governor.risk_manager.kill_switch_active:
-            print(f"🛑 KILL SWITCH ACTIVE: Strategy evaluation HALTED for {ticker}")
+            logger.warning(f"🛑 KILL SWITCH ACTIVE: Strategy evaluation HALTED for {ticker}")
             return
             
         strategies = db.query(Strategy).filter(
@@ -44,7 +47,7 @@ class StrategyEngine:
         ).all()
         
         if strategies:
-            print(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
+            logger.info(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
         
         # Explicitly log if no strategies found for ticker (optional for debugging, but let's stick to the requirement)
         

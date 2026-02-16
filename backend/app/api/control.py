@@ -8,6 +8,8 @@ from .auth import get_current_user
 from ..core.config import settings
 from ..services.polling_service import polling_service
 from ..services.risk_manager import RiskManager
+from ..db.session import SessionLocal
+from ..models.models import Strategy
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -98,3 +100,33 @@ async def kill_bot():
     
     logger.critical("🚨 EMERGENCY KILL SWITCH triggered via Dashboard. Bot LOCKED.")
     return {"message": "🚨 KILL SWITCH ACTIVADO. Bot bloqueado permanentemente hasta reinicio."}
+
+@router.get("/debug/engine")
+async def debug_engine_state():
+    """Provides deep visibility into the Strategy Engine's current state."""
+    db = SessionLocal()
+    try:
+        active_strategies = db.query(Strategy).filter(Strategy.status == "ACTIVE").all()
+        strategy_data = [
+            {
+                "id": s.id,
+                "ticker": s.ticker,
+                "type": s.type,
+                "params_count": len(s.params) if s.params else 0
+            } for s in active_strategies
+        ]
+        
+        return {
+            "polling_running": polling_service.running,
+            "polling_tickers": polling_service.tickers,
+            "polling_mode": polling_service.active_mode,
+            "engine_initialized": polling_service.engine is not None,
+            "active_strategies_count": len(active_strategies),
+            "strategies": strategy_data,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error in debug endpoint: {e}")
+        return {"error": str(e)}
+    finally:
+        db.close()

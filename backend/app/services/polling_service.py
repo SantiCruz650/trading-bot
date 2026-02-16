@@ -57,7 +57,7 @@ class PollingService:
                         accumulated = self._get_accumulated(symbol)
                         
                         # Log the cycle
-                        print(f"🕒 [{datetime.now().strftime('%H:%M:%S')}] {symbol}: ${price:,.2f} | Balance: ${balance:,.2f}")
+                        logger.info(f"🕒 [{datetime.now().strftime('%H:%M:%S')}] {symbol}: ${price:,.2f} | Balance: ${balance:,.2f}")
                         if settings.MOCK_EXCHANGE:
                             logger.info(f"🧪 [MOCK TICK] {symbol} @ {price:,.2f}")
                         
