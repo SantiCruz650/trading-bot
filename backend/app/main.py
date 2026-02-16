@@ -12,6 +12,10 @@ if not env_path.exists():
 # Add root directory to sys.path to allow importing shared
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 import asyncio
 import logging
 
