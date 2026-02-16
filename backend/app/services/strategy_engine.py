@@ -95,7 +95,7 @@ class StrategyEngine:
         interval_hours = params.get("interval_hours", 24)
         
         # 2. ML Insight (Passive & Active Filter)
-        ml_data = self._log_ml_insight(strategy, current_price)
+        ml_data = self._log_ml_insight(strategy, current_price, db)
         ml_signal = ml_data.get("signal", "NEUTRAL")
         ml_regime = ml_data.get("regime", "UNKNOWN")
         ml_strictness = ml_data.get("strictness", "NORMAL")
