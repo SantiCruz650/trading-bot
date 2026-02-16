@@ -27,6 +27,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+from .models.models import Base, User, Strategy
+from .db.session import SessionLocal
+
 from .core.config import settings
 from .api import auth_router, predictions_router, proxy_router, trading, control
 from .db.session import engine
@@ -34,6 +37,35 @@ from .models.models import Base
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+def seed_default_strategy():
+    """Ensure at least one ETH strategy exists for the first user."""
+    db = SessionLocal()
+    try:
+        user = db.query(User).first()
+        if not user:
+            logger.info("ℹ️ No user found to seed strategy.")
+            return
+            
+        ticker = "ETH/USDT"
+        existing = db.query(Strategy).filter(Strategy.ticker == ticker).first()
+        if not existing:
+            new_strategy = Strategy(
+                user_id=user.id,
+                ticker=ticker,
+                type="DCA",
+                params={"base_order": 10.0, "tp_pct": 1.5},
+                status="ACTIVE"
+            )
+            db.add(new_strategy)
+            db.commit()
+            logger.info(f"🚀 SEED: Created default {ticker} strategy for {user.username}")
+        else:
+            logger.info(f"ℹ️ SEED: Strategy for {ticker} already exists.")
+    except Exception as e:
+        logger.error(f"❌ SEED Error: {e}")
+    finally:
+        db.close()
 
 from app.services.report_service import generate_report
 
@@ -79,6 +111,9 @@ import asyncio
 @app.on_event("startup")
 async def startup_event():
     logger.info("DEBUG: Executing startup_event")
+    
+    # Seed default data if needed
+    seed_default_strategy()
     
     # Initialize Strategy Engine (Persistent State)
     from app.services.strategy_engine import StrategyEngine
