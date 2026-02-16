@@ -9,3 +9,7 @@ class RotationEngine:
     def get_shs(self, ticker):
         """Mock score: Returns 1.0 for now."""
         return 1.0
+
+    def calculate_shs(self, ml_metrics):
+        """Mock SHS calculation: Returns 1.0 for now."""
+        return 1.0

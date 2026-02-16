@@ -9,3 +9,7 @@ class ARDCAEngine:
     def calculate_size(self, ticker, base_amount, ml_confidence, market_regime, drawdown):
         """Mock calculation: Returns base_amount for now."""
         return base_amount
+
+    def calculate_order_multiplier(self, regime, confidence, drawdown):
+        """Mock multiplier calculation: Returns 1.0 (no change) for now."""
+        return 1.0
