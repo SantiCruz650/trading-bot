@@ -12,10 +12,16 @@ if not env_path.exists():
 # Add root directory to sys.path to allow importing shared
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from datetime import datetime
+import asyncio
+import logging
+
+# Configure logging to ensure visibility on Render (Python 3.11+)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
 
 from .core.config import settings
 from .api import auth_router, predictions_router, proxy_router, trading, control
@@ -68,7 +74,7 @@ import asyncio
 
 @app.on_event("startup")
 async def startup_event():
-    print("DEBUG: Executing startup_event")
+    logger.info("DEBUG: Executing startup_event")
     
     # Initialize Strategy Engine (Persistent State)
     from app.services.strategy_engine import StrategyEngine
@@ -76,13 +82,13 @@ async def startup_event():
     
     # Inject Engine into PollingService
     polling_service.engine = engine
-    print("📡 Strategy Engine integrated with Polling Service")
+    logger.info("📡 Strategy Engine integrated with Polling Service")
     
     # Start REST polling in background
     asyncio.create_task(polling_service.start())
     
     if os.getenv("HEADLESS_MODE") == "true" or True: # Always show in this local setup
-        print("🤖 Bot running in MODE:", settings.MOCK_EXCHANGE and "MOCK" or "PAPER/LIVE")
+        logger.info(f"🤖 Bot running in MODE: {settings.MOCK_EXCHANGE and 'MOCK' or 'PAPER/LIVE'}")
 
 @app.on_event("shutdown")
 async def shutdown_event():

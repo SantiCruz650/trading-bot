@@ -48,6 +48,9 @@ class StrategyEngine:
         
         if strategies:
             logger.info(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
+        else:
+            # Heartbeat: Explicitly log 0 strategies to verify the loop is running on Render
+            logger.info(f"💤 Ticker {ticker} checked: 0 active strategies found.")
         
         # Explicitly log if no strategies found for ticker (optional for debugging, but let's stick to the requirement)
         
