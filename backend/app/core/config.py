@@ -59,14 +59,10 @@ class Settings(BaseSettings):
     TELEGRAM_CHAT_ID: str = ""
 
     # CORS
-    CORS_ORIGINS: list[str] = [
-        "http://localhost:8080",
-        "https://localhost:8080",
-        "https://*.ngrok.io",
-        "https://*.ngrok-free.app",
-        "https://*.ngrok-free.dev",
-        "https://*.onrender.com",
-        "https://*.netlify.app"
+    CORS_ORIGINS = [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "https://santicruz650.github.io"
     ]
 
 @lru_cache()
