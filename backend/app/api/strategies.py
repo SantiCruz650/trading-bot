@@ -49,3 +49,17 @@ def stop_strategy(strategy_id: int, db: Session = Depends(get_db), current_user:
     strategy.status = "TERMINATED"
     db.commit()
     return {"message": "Strategy stopped"}
+
+@router.get("/{strategy_id}")
+def get_strategy_detail(strategy_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    strategy = db.query(Strategy).filter(Strategy.id == strategy_id, Strategy.user_id == current_user.id).first()
+    if not strategy:
+        raise HTTPException(status_code=404, detail="Strategy not found")
+    return strategy
+
+@router.get("/{strategy_id}/executions")
+def get_strategy_executions(strategy_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    strategy = db.query(Strategy).filter(Strategy.id == strategy_id, Strategy.user_id == current_user.id).first()
+    if not strategy:
+        raise HTTPException(status_code=404, detail="Strategy not found")
+    return strategy.executions
