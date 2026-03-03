@@ -40,3 +40,18 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.get("/users/me", response_model=User)
 async def read_users_me(current_user: UserModel = Depends(get_current_user)):
     return current_user
+
+@router.get("/verify", response_model=User)
+async def verify_token(current_user: UserModel = Depends(get_current_user)):
+    """Validate current session token and return user profile."""
+    return current_user
+
+@router.post("/accept-manual")
+async def accept_manual(
+    current_user: UserModel = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    current_user.first_login = False
+    db.add(current_user)
+    db.commit()
+    return {"message": "Manual accepted successfully", "first_login": False}

@@ -25,7 +25,7 @@ class Settings(BaseSettings):
 
     # Services
     # ML service base URL
-    ML_SERVICE_URL: str = "http://localhost:8001"
+    ML_SERVICE_URL: str = "https://trading-bot-kea3.onrender.com"
     FRONTEND_URL: str = "http://localhost:8080"
     
     # Environment
@@ -44,11 +44,12 @@ class Settings(BaseSettings):
     # Trading
     BASE_TRADE_AMOUNT: float = 2.0
     OBSERVATION_ONLY: bool = False
+    MAX_SIMULTANEOUS_ORDERS: int = 5
 
     # ETAPA 2A - Risk Containment
     ETAPA_2A_ACTIVE: bool = True
-    GEC_SOFT_CAP: float = 0.65
-    GEC_HARD_CAP: float = 0.80
+    GEC_SOFT_CAP: float = 0.20
+    GEC_HARD_CAP: float = 0.30
     FREEZE_DD_THRESHOLD: float = 0.015  # 1.5%
     KILL_SWITCH_DD_THRESHOLD: float = 0.030  # 3.0%
     KILL_SWITCH_ER_THRESHOLD: float = 0.95
@@ -60,10 +61,13 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: list[str] = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://santicruz650.github.io"
-]
+        "https://santicruz650.github.io",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:8080"
+    ]
 
 @lru_cache()
 def get_settings() -> Settings:

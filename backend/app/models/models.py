@@ -8,6 +8,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    first_login = Column(Boolean, default=True)
     predictions = relationship("Prediction", back_populates="owner")
     paper_trades = relationship("PaperTrade", back_populates="owner")
     alerts = relationship("Alert", back_populates="owner")

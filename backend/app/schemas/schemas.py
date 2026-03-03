@@ -15,6 +15,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    first_login: bool
 
     class Config:
         from_attributes = True

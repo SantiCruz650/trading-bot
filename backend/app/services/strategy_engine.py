@@ -102,15 +102,8 @@ class StrategyEngine:
         ml_confidence = ml_data.get("confidence", 0.5)
         
         # 2.1 ETAPA 2B Metrics Analysis
-        try:
-            with httpx.Client(timeout=2.0) as client:
-                resp = client.get(f"{settings.ML_SERVICE_URL}/metrics/{strategy.ticker}")
-                if resp.status_code == 200:
-                    ml_metrics = resp.json()
-                else:
-                    ml_metrics = {}
-        except:
-            ml_metrics = {}
+        from app.services.ml_service import ml_service
+        ml_metrics = ml_service.get_metrics_sync(strategy.ticker)
             
         # 2.2 Global Risk Governance
         portfolio_stats = self._get_global_portfolio_stats(db)
@@ -228,7 +221,7 @@ class StrategyEngine:
         can_buy = True
         
         # ETAPA 2A - Check Risk Manager approval for new position
-        risk_can_open, risk_reason = self.risk_manager.can_open_position("BUY")
+        risk_can_open, risk_reason = self.risk_manager.can_open_position(db, "BUY")
         if not risk_can_open:
             print(f"🛡️ ETAPA 2A: BUY blocked - {risk_reason}")
             # If Hard Cap, cancel pending orders (simulated)
@@ -281,12 +274,17 @@ class StrategyEngine:
             if not last_buy:
                 should_buy = True
             else:
-                time_since = datetime.utcnow() - last_buy.timestamp
-                # ETAPA 2B - Enforce min interval from config
-                min_interval_sec = self.config_2b.get("ar_dca", {}).get("min_dca_interval_seconds", 0)
-                
-                if time_since >= timedelta(hours=interval_hours) and time_since >= timedelta(seconds=min_interval_sec):
-                    should_buy = True
+                # ETAPA 3 - Rigid DCA Cap (20 levels)
+                if dca_levels >= 20:
+                    print(f"🛑 Institutional Cap Reached: {dca_levels}/20 levels for {strategy.ticker}.")
+                    should_buy = False
+                else:
+                    time_since = datetime.utcnow() - last_buy.timestamp
+                    # ETAPA 2B - Enforce min interval from config
+                    min_interval_sec = self.config_2b.get("ar_dca", {}).get("min_dca_interval_seconds", 0)
+                    
+                    if time_since >= timedelta(hours=interval_hours) and time_since >= timedelta(seconds=min_interval_sec):
+                        should_buy = True
             
             if should_buy:
                 # ETAPA 2B - Apply AR-DCA Adaptive Multiplier
@@ -495,40 +493,30 @@ class StrategyEngine:
         ticker = strategy.ticker
         data = {"signal": "NEUTRAL", "regime": "UNKNOWN", "strictness": "NORMAL"}
         try:
-            from app.core.config import settings
-            ml_url = f"{settings.ML_SERVICE_URL}/predict/{ticker}"
-            # We use a short timeout to not block the loop
-            with httpx.Client(timeout=2.0) as client:
-                response = client.get(ml_url)
-                if response.status_code == 200:
-                    data = response.json()
-                    ml_signal = data.get("signal", "NEUTRAL")
-                    # Use actual confidence if available, otherwise mock it
-                    prob = data.get("confidence", 0.5 + (0.1 if ml_signal == "BUY" else -0.1 if ml_signal == "SELL" else 0))
-                    data["confidence"] = prob
-                    # Only log if not already logged recently to avoid spam, or if signal changed
-                    # For now, we log every time as requested in "Logging y Visibilidad"
-                    # print(f"🧠 ML Insight {ticker}: {ml_signal} ({prob:.2f})")
-                    
-                    # Record for correlation
-                    log_path = Path(__file__).resolve().parent.parent.parent / "ml_correlation.log"
-                    with open(log_path, "a") as f:
-                        f.write(f"{datetime.utcnow().isoformat()} | {ticker} | {ml_signal} | {current_price:.2f}\n")
-                        
-                    # Store for evaluation
-                    params = strategy.params or {}
-                    pending = params.get("pending_ml_evaluations", [])
-                    pending.append({
-                        "signal": ml_signal,
-                        "entry_price": current_price,
-                        "timestamp": datetime.utcnow().isoformat()
-                    })
-                    params["pending_ml_evaluations"] = pending
-                    strategy.params = params
-                    flag_modified(strategy, "params")
-                    db.commit()
-        except Exception:
-            # Silent fail for ML insight to maintain stability
+            from app.services.ml_service import ml_service
+            data = ml_service.get_prediction_sync(ticker)
+            ml_signal = data.get("signal", "NEUTRAL")
+            prob = data.get("confidence", 0.5)
+            
+            # Record for correlation
+            log_path = Path(__file__).resolve().parent.parent.parent / "ml_correlation.log"
+            with open(log_path, "a") as f:
+                f.write(f"{datetime.utcnow().isoformat()} | {ticker} | {ml_signal} | {current_price:.2f}\n")
+                
+            # Store for evaluation
+            params = strategy.params or {}
+            pending = params.get("pending_ml_evaluations", [])
+            pending.append({
+                "signal": ml_signal,
+                "entry_price": current_price,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+            params["pending_ml_evaluations"] = pending
+            strategy.params = params
+            flag_modified(strategy, "params")
+            db.commit()
+        except Exception as e:
+            logger.warning(f"Failed to log ML insight: {str(e)}")
             pass
         return data
 
@@ -611,26 +599,40 @@ class StrategyEngine:
         # 1. Place order via ExchangeService (updates virtual balance)
         balance_before = exchange.get_balance()
         
-        # For SELL, amount is USDT value to sell
-        order = exchange.place_market_order(
-            symbol=strategy.ticker, # Now already in "BTC/USDT" format
-            side=order_type.lower(),
-            amount=amount / price
-        )
-        
-        if not order:
-            print(f"❌ Failed to execute {order_type} for {strategy.ticker}: Insufficient balance")
-            return f"Failed to execute {order_type} for {strategy.ticker}: Insufficient balance"
+        try:
+            # For SELL, amount is USDT value to sell
+            order = exchange.place_market_order(
+                symbol=strategy.ticker, # Now already in "BTC/USDT" format
+                side=order_type.lower(),
+                amount=amount / price
+            )
+            
+            if not order:
+                print(f"❌ Failed to execute {order_type} for {strategy.ticker}: Insufficient balance")
+                return f"Failed to execute {order_type} for {strategy.ticker}: Insufficient balance"
+        except ValueError as ve:
+            error_msg = f"❌ Error de Seguridad en {order_type} para {strategy.ticker}: {str(ve)}"
+            print(error_msg)
+            return error_msg
+        except Exception as e:
+            error_msg = f"❌ Error Inesperado en {order_type} para {strategy.ticker}: {str(e)}"
+            print(error_msg)
+            return error_msg
 
         balance_after = exchange.get_balance()
         
         # 2. Logging and PnL calculation
+        order_fee = order.get('fee', 0.0)
+        
         if order_type.upper() == "BUY":
-            print(f"📊 BUY {strategy.ticker} | Price: ${price:,.2f} | Amount: {amount:.2f} USDT | Balance: ${balance_before:,.2f} -> ${balance_after:,.2f}")
+            print(f"📊 BUY {strategy.ticker} | Price: ${price:,.2f} | Amount: {amount:.2f} USDT | Fee: ${order_fee:.4f} | Balance: ${balance_before:,.2f} -> ${balance_after:,.2f}")
         else:
-            pnl = (price - avg_buy_price) * (amount / price) if avg_buy_price else 0
+            # PnL must reflect cumulative fees
+            # We estimate sell fees + existing buy fees
+            total_fee = order_fee # Sell fee
+            pnl = (price - avg_buy_price) * (amount / price) - total_fee if avg_buy_price else 0
             pnl_str = f"+{pnl:.2f}" if pnl >= 0 else f"{pnl:.2f}"
-            print(f"📉 SELL {strategy.ticker} | Price: ${price:,.2f} | ETH Sold: {amount/price:.6f} | Balance: ${balance_before:,.2f} -> ${balance_after:,.2f} | PnL: {pnl_str} USDT")
+            print(f"📉 SELL {strategy.ticker} | Price: ${price:,.2f} | ETH Sold: {amount/price:.6f} | Fee: ${order_fee:.4f} | Balance: ${balance_before:,.2f} -> ${balance_after:,.2f} | PnL: {pnl_str} USDT")
 
         # 3. Record Execution
         execution = StrategyExecution(

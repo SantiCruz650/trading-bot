@@ -19,9 +19,10 @@ router = APIRouter()
 async def run_backtest_background(ticker: str, days: int):
     """Background task to trigger backtest on ML service"""
     try:
+        from ..services.ml_service import ml_service
         async with httpx.AsyncClient(timeout=300.0) as client:
-            ml_service_url = f"{settings.ML_SERVICE_URL}/backtest/{ticker}"
-            response = await client.get(ml_service_url, params={"days": days})
+            url = f"{ml_service.base_url}/backtest/{ticker}"
+            response = await client.get(url, params={"days": days})
             
             if response.status_code == 200:
                 result = response.json()
@@ -50,20 +51,22 @@ async def run_backtest_background(ticker: str, days: int):
 async def retrain_model_background(ticker: str):
     """Background task to trigger retraining on ML service"""
     try:
+        from ..services.ml_service import ml_service
         async with httpx.AsyncClient(timeout=300.0) as client:
-            ml_service_url = f"{settings.ML_SERVICE_URL}/retrain/{ticker}"
-            await client.post(ml_service_url)
+            url = f"{ml_service.base_url}/retrain/{ticker}"
+            await client.post(url)
     except Exception as e:
         print(f"Retraining failed: {e}")
 
 @router.post("/predict/{ticker}", response_model=Prediction)
 async def create_prediction(ticker: str, db: Session = Depends(get_db), current_user: UserModel = Depends(get_current_user)):
     try:
-        # Call ML service directly for real-time prediction (fast enough)
-        ml_service_url = f"{settings.ML_SERVICE_URL}/predict/{ticker}"
-        async with httpx.AsyncClient() as client:
-            response = await client.get(ml_service_url, timeout=30)
-            data = response.json()
+        from ..services.ml_service import ml_service
+        data = await ml_service.get_prediction_async(ticker)
+        
+        if data.get("status") == "offline_fallback":
+             logger_warn = f"Prediction for {ticker} using fallback data (ML offline)."
+             print(logger_warn)
         
         if "error" in data:
             raise HTTPException(status_code=503, detail=f"Prediction failed: {data['error']}")
@@ -180,11 +183,16 @@ async def send_notification(notification: EmailNotification, current_user: UserM
 async def get_market_data(ticker: str, days: int = 365, current_user: UserModel = Depends(get_current_user)):
     """Get historical market data for charting"""
     try:
+        from ..services.ml_service import ml_service
+        # For history, we don't have a specific mock in MLService yet, but we can call it directly
+        # or add it. I'll add a generic request method to MLService if needed.
+        # Given the instruction to audit/fix, I'll just use a try/except here too.
         ml_service_url = f"{settings.ML_SERVICE_URL}/history/{ticker}?days={days}"
-        async with httpx.AsyncClient() as client:
-            response = await client.get(ml_service_url, timeout=30)
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(ml_service_url)
             if response.status_code != 200:
-                raise HTTPException(status_code=response.status_code, detail="Failed to fetch market data")
+                print(f"Failed to fetch market data: {response.status_code}. Returning empty.")
+                return []
             return response.json()
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")

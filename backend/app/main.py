@@ -102,7 +102,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
 from .services.polling_service import polling_service

@@ -117,7 +117,19 @@ class ExchangeService:
         except Exception as e:
             logger.error(f"Failed to initialize exchange: {e}. Falling back to LOCAL SIMULATION.")
             self.local_simulation = True
-    
+
+    def round_amount(self, symbol: str, amount: float) -> float:
+        """Round amount based on exchange rules"""
+        if self.local_simulation or not self.exchange:
+            return round(amount, 6)
+        return float(self.exchange.amount_to_precision(symbol, amount))
+
+    def round_price(self, symbol: str, price: float) -> float:
+        """Round price based on exchange rules"""
+        if self.local_simulation or not self.exchange:
+            return round(price, 2)
+        return float(self.exchange.price_to_precision(symbol, price))
+
     def get_balance(self, currency: str = 'USDT') -> float:
         """Get account balance"""
         if self.local_simulation:
@@ -162,22 +174,40 @@ class ExchangeService:
             price = self.get_ticker_price(symbol)
             if not price:
                 return None
+            
+            # --- SECURITY AUDIT: Precision Rounding ---
+            amount = self.round_amount(symbol, amount)
+            # Fetch current market price again if needed, or just use the one we got
+            price = self.round_price(symbol, price)
                 
             cost = amount * price
             
+            # --- SECURITY AUDIT: Balance Validation (Real API) ---
+            if not self.local_simulation:
+                try:
+                    current_free_usdt = self.get_balance('USDT')
+                    # Estimate cost with 0.1% buffer for fees
+                    estimated_total_cost = cost * 1.001 
+                    if side == 'buy' and estimated_total_cost > current_free_usdt:
+                        logger.error(f"❌ Fondos insuficientes: Necesitas {estimated_total_cost:.2f} USDT, tienes {current_free_usdt:.2f} USDT")
+                        raise ValueError("Fondos insuficientes")
+                except Exception as e:
+                    if "Fondos insuficientes" in str(e): raise e
+                    logger.warning(f"Could not verify balance before trade: {e}")
+            
             if self.local_simulation:
-                if side == 'buy' and cost > self.virtual_balance:
-                    logger.error(f"Insufficient virtual balance: {self.virtual_balance} < {cost}")
-                    return None
-                
-                # Update virtual balance
+                # Update virtual balance with fees (0.1% = 0.001)
+                fee = cost * 0.001
                 if side == 'buy':
-                    self.virtual_balance -= cost
+                    if cost + fee > self.virtual_balance:
+                        logger.error(f"Insufficient virtual balance (including fees): {self.virtual_balance} < {cost + fee}")
+                        return None
+                    self.virtual_balance -= (cost + fee)
                 else:
-                    self.virtual_balance += cost
+                    self.virtual_balance += (cost - fee)
                 
                 order_id = f"sim_{int(datetime.now().timestamp())}"
-                logger.info(f"✅ [SIM] {side.upper()} {amount} {symbol} @ ${price:,.2f} | Balance: ${self.virtual_balance:,.2f}")
+                logger.info(f"✅ [SIM] {side.upper()} {amount} {symbol} @ ${price:,.2f} | Fee: ${fee:.4f} | Balance: ${self.virtual_balance:,.2f}")
                 
                 return {
                     'id': order_id,
@@ -185,6 +215,7 @@ class ExchangeService:
                     'side': side,
                     'amount': amount,
                     'price': price,
+                    'fee': fee,
                     'status': 'filled'
                 }
             
@@ -200,10 +231,11 @@ class ExchangeService:
                 except:
                     pass
                     
+                fee = cost * 0.001
                 order_id = f"dry_run_{int(datetime.now().timestamp())}"
                 intent_label = f"INTENT_{side.upper()}"
                 
-                logger.warning(f"🛡️ {intent_label} | {amount} {symbol} @ ${price:,.2f} | Latency: {latency:.2f}ms")
+                logger.warning(f"🛡️ {intent_label} | {amount} {symbol} @ ${price:,.2f} | Fee (Est): ${fee:.4f} | Latency: {latency:.2f}ms")
                 print(f"🛡️ DRY_RUN: {intent_label} {amount} {symbol} intercepted. Latency: {latency:.2f}ms")
                 
                 return {
@@ -212,6 +244,7 @@ class ExchangeService:
                     'side': side,
                     'amount': amount,
                     'price': price,
+                    'fee': fee,
                     'status': 'filled',
                     'info': {'dry_run': True, 'latency_ms': latency, 'intent': intent_label}
                 }

@@ -177,11 +177,21 @@ class RiskManager:
         
         return adjustments
     
-    def can_open_position(self, side: str = "BUY") -> Tuple[bool, str]:
-        """Check if opening a new position is allowed based on GEC state."""
+    def can_open_position(self, db, side: str = "BUY") -> Tuple[bool, str]:
+        """Check if opening a new position is allowed based on GEC state and limits."""
         if not self.settings.ETAPA_2A_ACTIVE:
             return True, "OK"
         
+        # --- SECURITY AUDIT: Limit Simultaneous Orders ---
+        if side.upper() == "BUY":
+            from app.models.models import PaperTrade
+            open_positions_count = db.query(PaperTrade).filter(PaperTrade.status == "OPEN").count()
+            max_orders = getattr(self.settings, "MAX_SIMULTANEOUS_ORDERS", 5)
+            if open_positions_count >= max_orders:
+                reason = f"🚫 Límite de órdenes alcanzado: {open_positions_count}/{max_orders} posiciones abiertas."
+                logger.warning(reason)
+                return False, reason
+
         # Update GEC state first
         self.update_gec_state()
         

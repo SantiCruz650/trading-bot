@@ -1,0 +1,93 @@
+window.API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? `http://${window.location.hostname}:8000/api`
+    : (window.location.hostname === 'santicruz650.github.io')
+        ? (localStorage.getItem('FORCED_API_URL') || "https://mcrypto-api.ngrok-free.app/api")
+        : "/api";
+
+const auth = {
+    saveToken(token) {
+        localStorage.setItem('access_token', token);
+    },
+
+    getToken() {
+        return localStorage.getItem('access_token');
+    },
+
+    logout() {
+        localStorage.removeItem('access_token');
+        window.location.reload(); // Recargar para volver al estado de login
+    },
+
+    isAuthenticated() {
+        const token = this.getToken();
+        if (!token) return false;
+
+        try {
+            // Verificación básica de expiración del JWT (opcional pero recomendado)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const exp = payload.exp * 1000;
+            if (Date.now() >= exp) {
+                this.logout();
+                return false;
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
+
+    getUser() {
+        const token = this.getToken();
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.sub; // username/email
+        } catch (e) {
+            return null;
+        }
+    },
+
+    async login(username, password) {
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        // Notar que el backend usa /api/auth/token para login OAuth2
+        const response = await fetch(`${window.API_BASE_URL}/auth/token`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+            headers: { 'ngrok-skip-browser-warning': 'true' }
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.detail || 'Error en el inicio de sesión');
+        }
+
+        this.saveToken(data.access_token);
+        return data;
+    },
+
+    async register(username, password) {
+        const response = await fetch(`${window.API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.detail || 'Error en el registro');
+        }
+
+        return data;
+    }
+};
+
+// Exponer globalmente
+window.auth = auth;
