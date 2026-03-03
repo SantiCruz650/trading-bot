@@ -12,8 +12,11 @@ async def ml_service_proxy(path: str, request: Request):
     
     # Special handling for metrics to provide mock fallback
     if "metrics" in path and request.method == "GET":
-        parts = path.split("/")
-        ticker = parts[-1] if parts else "ETH"
+        parts = path.strip("/").split("/")
+        # Path usually is 'metrics/TICKER' or 'metrics/TICKER/PAIR'
+        ticker = parts[1] if len(parts) > 1 else "ETH"
+        # Sanitize just in case it's a full pair
+        ticker = ticker.split("/")[0].split("-")[0].upper()
         data = await ml_service.get_metrics_async(ticker)
         return data
 

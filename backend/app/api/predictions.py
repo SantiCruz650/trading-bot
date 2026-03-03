@@ -20,8 +20,10 @@ async def run_backtest_background(ticker: str, days: int):
     """Background task to trigger backtest on ML service"""
     try:
         from ..services.ml_service import ml_service
+        # Sanitize ticker (e.g., 'ETH/USDT' -> 'ETH')
+        clean_ticker = ticker.split("/")[0].upper()
         async with httpx.AsyncClient(timeout=300.0) as client:
-            url = f"{ml_service.base_url}/backtest/{ticker}"
+            url = f"{ml_service.base_url}/backtest/{clean_ticker}"
             response = await client.get(url, params={"days": days})
             
             if response.status_code == 200:
@@ -52,8 +54,10 @@ async def retrain_model_background(ticker: str):
     """Background task to trigger retraining on ML service"""
     try:
         from ..services.ml_service import ml_service
+        # Sanitize ticker
+        clean_ticker = ticker.split("/")[0].upper()
         async with httpx.AsyncClient(timeout=300.0) as client:
-            url = f"{ml_service.base_url}/retrain/{ticker}"
+            url = f"{ml_service.base_url}/retrain/{clean_ticker}"
             await client.post(url)
     except Exception as e:
         print(f"Retraining failed: {e}")

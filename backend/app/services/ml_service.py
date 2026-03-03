@@ -36,24 +36,34 @@ class MLService:
             "status": "offline_fallback"
         }
 
+    def _sanitize_ticker(self, ticker: str) -> str:
+        """Extract base ticker from pair (e.g., 'ETH/USDT' -> 'ETH')"""
+        if not ticker:
+            return "ETH"
+        return ticker.split("/")[0].upper()
+
     async def get_metrics_async(self, ticker: str) -> Dict[str, Any]:
         """Async fetch for dashboard/proxy"""
-        url = f"{self.base_url}/metrics/{ticker}"
+        clean_ticker = self._sanitize_ticker(ticker)
+        url = f"{self.base_url}/metrics/{clean_ticker}"
         return await self._request_with_retry_async("GET", url, fallback=self.DEFAULT_METRICS)
 
     async def get_prediction_async(self, ticker: str) -> Dict[str, Any]:
         """Async fetch for predictions API"""
-        url = f"{self.base_url}/predict/{ticker}"
+        clean_ticker = self._sanitize_ticker(ticker)
+        url = f"{self.base_url}/predict/{clean_ticker}"
         return await self._request_with_retry_async("GET", url, fallback=self.DEFAULT_PREDICTION)
 
     def get_metrics_sync(self, ticker: str) -> Dict[str, Any]:
         """Sync fetch for StrategyEngine"""
-        url = f"{self.base_url}/metrics/{ticker}"
+        clean_ticker = self._sanitize_ticker(ticker)
+        url = f"{self.base_url}/metrics/{clean_ticker}"
         return self._request_with_retry_sync("GET", url, fallback=self.DEFAULT_METRICS)
 
     def get_prediction_sync(self, ticker: str) -> Dict[str, Any]:
         """Sync fetch for StrategyEngine logic if needed"""
-        url = f"{self.base_url}/predict/{ticker}"
+        clean_ticker = self._sanitize_ticker(ticker)
+        url = f"{self.base_url}/predict/{clean_ticker}"
         return self._request_with_retry_sync("GET", url, fallback=self.DEFAULT_PREDICTION)
 
     async def _request_with_retry_async(self, method: str, url: str, fallback: Any, **kwargs) -> Any:
