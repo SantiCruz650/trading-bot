@@ -48,16 +48,19 @@ const auth = {
     },
 
     async login(username, password) {
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
 
-        // Notar que el backend usa /api/auth/token para login OAuth2
+        // OAuth2 standard expects application/x-www-form-urlencoded
         const response = await fetch(`${window.API_BASE_URL}/auth/token`, {
             method: 'POST',
-            body: formData,
-            credentials: 'include',
-            headers: { 'ngrok-skip-browser-warning': 'true' }
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: params,
+            credentials: 'include'
         });
 
         const data = await response.json();
