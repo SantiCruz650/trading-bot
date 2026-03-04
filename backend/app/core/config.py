@@ -24,9 +24,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Services
-    # ML service base URL
+    # ML service base URL (Environment variables take precedence)
     ML_SERVICE_URL: str = "https://trading-bot-kea3.onrender.com"
-    FRONTEND_URL: str = "http://localhost:8080"
+    FRONTEND_URL: str = "https://santicruz650.github.io"
+    NGROK_URL: str = "" # Optional override
     
     # Environment
     ENV: str = "production"

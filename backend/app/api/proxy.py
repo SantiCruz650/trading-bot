@@ -10,18 +10,28 @@ router = APIRouter()
 async def ml_service_proxy(path: str, request: Request):
     """Reverse proxy for ML service requests with resiliency fallback"""
     
-    # Special handling for metrics to provide mock fallback
-    if "metrics" in path and request.method == "GET":
-        parts = path.strip("/").split("/")
-        # Path usually is 'metrics/TICKER' or 'metrics/TICKER/PAIR'
+    # List of endpoints that expect a sanitized ticker (e.g., 'ETH' instead of 'ETH/USDT')
+    sanitized_endpoints = ["metrics", "predict", "backtest", "retrain"]
+    
+    parts = path.strip("/").split("/")
+    if parts and parts[0] in sanitized_endpoints:
+        base_endpoint = parts[0]
+        # Ticker is usually the second part: 'predict/ETH/USDT' -> parts[1] is 'ETH'
         ticker = parts[1] if len(parts) > 1 else "ETH"
-        # Sanitize just in case it's a full pair
-        ticker = ticker.split("/")[0].split("-")[0].upper()
-        data = await ml_service.get_metrics_async(ticker)
-        return data
+        # Aggressive cleaning: split by any common separator and take the first part
+        clean_ticker = ticker.replace("-", "/").split("/")[0].upper()
+        
+        # Rewrite the URL for the request
+        url = f"/{base_endpoint}/{clean_ticker}"
+        print(f"[Proxy] Sanitizing request: {path} -> {url}")
+        
+        # For metrics specifically, we still use the internal ml_service helper for fallback support
+        if base_endpoint == "metrics" and request.method == "GET":
+            data = await ml_service.get_metrics_async(clean_ticker)
+            return data
+    else:
+        url = f"/{path}".replace("//", "/")
 
-    # Generic proxy for other paths (retrain, backtest, etc.)
-    url = f"/{path}".replace("//", "/")
     full_url = f"{settings.ML_SERVICE_URL}{url}"
     print(f"[Proxy] Llamando al servicio de ML en: {full_url}")
     
