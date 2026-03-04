@@ -15,6 +15,17 @@ ls -F /app/frontend || echo "Frontend dir not found"
 echo "Listing /app/backend:"
 ls -F /app/backend
 
-# Start the application
-# We use the PORT environment variable provided by Render
-gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+# Start the ML service in the background
+echo "Starting ML Service on port 8001..."
+export PYTHONPATH=$PYTHONPATH:/app:/app/ml_service
+python3 -m uvicorn ml_service.app.main:app --host 0.0.0.0 --port 8001 > /app/ml_service.log 2>&1 &
+
+# Wait for ML service to be ready
+echo "Waiting for ML service health check..."
+sleep 5
+
+# Start the application (Backend)
+# We use the PORT environment variable provided by Render for the backend
+echo "Starting Backend on port $PORT..."
+export PYTHONPATH=$PYTHONPATH:/app/backend
+gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT

@@ -26,6 +26,13 @@ async function startApp() {
     if (APP.initialized) return;
     APP.initialized = true;
 
+    // --- FORZAR MANUAL (UNA VEZ) ---
+    if (!localStorage.getItem('manualV2_forced')) {
+        console.warn("[System] Clearing localStorage to force Onboarding Manual...");
+        localStorage.clear();
+        localStorage.setItem('manualV2_forced', 'true');
+    }
+
     console.info("[App] Booting Terminal...");
 
     // --- MANUAL / ONBOARDING (ALWAYS SHOW TEMPORARILY) ---

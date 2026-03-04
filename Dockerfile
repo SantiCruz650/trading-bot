@@ -14,13 +14,17 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy requirements first to leverage cache
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY backend/requirements.txt ./backend_requirements.txt
+COPY ml_service/requirements.txt ./ml_requirements.txt
+RUN pip install --no-cache-dir -r backend_requirements.txt
+RUN pip install --no-cache-dir -r ml_requirements.txt
 
 # Copy the rest of the application
 COPY backend/ ./backend/
-COPY frontend/ ./frontend/
+COPY ml_service/ ./ml_service/
 COPY shared/ ./shared/
+# Frontend files are now in the root
+COPY index.html app.js style.css auth.js api.js ./
 COPY start_docker.sh .
 
 # Make start script executable
