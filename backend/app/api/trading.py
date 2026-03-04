@@ -36,7 +36,7 @@ class TradeResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class AlertResponse(BaseModel):
     id: int
@@ -46,7 +46,7 @@ class AlertResponse(BaseModel):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # --- Endpoints ---
 
