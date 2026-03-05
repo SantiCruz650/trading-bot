@@ -15,7 +15,24 @@ Updated `frontend_v2/app.js` to use `import.meta.env.VITE_API_URL`. This allows 
 - Added "Backend no conectado" messages in the status indicators and button tooltips when the connection is lost.
 - Updated `styles.css` with professional-looking disabled states for all dashboard buttons.
 
-### 4. Configuration Template
+### 4. ML Integration (Direct Logic)
+- **Action**: Refactored `predictions.py` and `proxy.py` to eliminate all internal HTTP calls to `localhost:8001`.
+- **Logic**: The backend now uses `MLService` and direct imports from `ml_service.app.main` to execute predictions, metrics, backtests, and retraining.
+- **Resiliency**: Added robust `try/except` blocks to ensure the bot continues operating with fallback data if ML logic is unavailable.
+
+### 5. Pydantic V2 Migration
+- **Action**: Updated schemas in `api/schemas.py` and other locations to use `ConfigDict(from_attributes=True)`.
+- **Reason**: Cleaned up Pydantic V2 warnings in Render logs and ensured future-proof model configuration.
+
+### 6. Frontend Stabilization & Reset
+- **Action**: Inserted a one-time `localStorage.clear()` event in `app.js` to reset onboarding.
+- **URL**: Verified that `api.js` points to the correct production URL: `https://trading-bot-kea3.onrender.com`.
+
+### 7. Repository Cleanup
+The following redundant or temporary files were deleted:
+- `styles.css`, `.env.bak`, `backtest_results.json`, `ml_service/Dockerfile`, `_redirects`, `.pytest_cache/`.
+
+### 8. Configuration Template
 Created `frontend_v2/.env.example` to document the required environment variable for deployment.
 
 ## Verification Results

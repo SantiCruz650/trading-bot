@@ -25,40 +25,33 @@ async def ml_service_proxy(path: str, request: Request):
         url = f"/{base_endpoint}/{clean_ticker}"
         print(f"[Proxy] Sanitizing request: {path} -> {url}")
         
-        # For metrics specifically, we still use the internal ml_service helper for fallback support
-        if base_endpoint == "metrics" and request.method == "GET":
-            data = await ml_service.get_metrics_async(clean_ticker)
-            return data
-    else:
-        url = f"/{path}".replace("//", "/")
-
-    full_url = f"{settings.ML_SERVICE_URL}{url}"
-    print(f"[Proxy] Llamando al servicio de ML en: {full_url}")
-    
-    headers = dict(request.headers)
-    headers.pop("host", None)
-    body = await request.body()
-    
+    # Direct integration logic for Reverse Proxy
     try:
-        async with httpx.AsyncClient(base_url=settings.ML_SERVICE_URL, timeout=60.0) as client:
-            response = await client.request(
-                method=request.method,
-                url=url,
-                content=body,
-                headers=headers,
-                params=request.query_params,
-            )
-            return Response(
-                content=response.content,
-                status_code=response.status_code,
-                headers=dict(response.headers)
-            )
-    except Exception as exc:
-        # Fallback for ANY ML proxy failure: return HOLD prediction or empty metrics
-        logger_warn = f"Proxy to ML failed for {path}: {str(exc)}. Returning safety mock."
-        print(logger_warn) # Simple logging for now
+        if base_endpoint == "metrics" and request.method == "GET":
+            return await ml_service.get_metrics_async(clean_ticker)
         
+        if base_endpoint == "predict" and request.method == "GET":
+            return await ml_service.get_prediction_async(clean_ticker)
+
+        # For backtest, retrain, and history, try direct import from ml_service.app.main
+        from ml_service.app.main import run_full_backtest, retrain_model, get_history
+        
+        if base_endpoint == "backtest":
+             days = int(request.query_params.get("days", 100))
+             return await run_full_backtest(clean_ticker, days=days)
+        
+        if base_endpoint == "retrain":
+             return await retrain_model(clean_ticker)
+             
+        if base_endpoint == "history":
+             days = int(request.query_params.get("days", 365))
+             return await get_history(clean_ticker, days=days)
+
+        # Default fallback for unknown endpoints handled by proxy
+        return {"status": "offline_fallback", "message": f"Endpoint {path} not natively supported in direct mode."}
+
+    except Exception as exc:
+        print(f"[Proxy] Direct integration failed for {path}: {exc}")
         if "predict" in path:
             return {"signal": "HOLD", "confidence": 0.5, "status": "proxy_fallback"}
-        
-        return {"status": "offline", "detail": "ML Service currently unavailable. System operating in safety mode."}
+        return {"status": "offline", "detail": "ML Logic currently unavailable. System operating in safety mode."}

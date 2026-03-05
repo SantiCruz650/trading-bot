@@ -22,25 +22,25 @@ async def run_backtest_background(ticker: str, days: int):
         from ..services.ml_service import ml_service
         # Sanitize ticker (e.g., 'ETH/USDT' -> 'ETH')
         clean_ticker = ticker.split("/")[0].upper()
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            url = f"{ml_service.base_url}/backtest/{clean_ticker}"
-            response = await client.get(url, params={"days": days})
-            
-            if response.status_code == 200:
-                result = response.json()
-                # Broadcast result via WebSocket
-                await manager.broadcast({
-                    "type": "backtest_complete",
-                    "ticker": ticker,
-                    "data": result
-                })
-            else:
-                print(f"Backtest failed with status {response.status_code}")
-                await manager.broadcast({
-                    "type": "backtest_error",
-                    "ticker": ticker,
-                    "error": f"ML Service returned {response.status_code}"
-                })
+        # Use direct ML logic via DataFetcher or direct import
+        # We'll skip the HTTP call and use the direct logic
+        try:
+             from ml_service.app.main import run_full_backtest
+             result = await run_full_backtest(clean_ticker, days=days)
+             
+             # Broadcast result via WebSocket
+             await manager.broadcast({
+                 "type": "backtest_complete",
+                 "ticker": ticker,
+                 "data": result
+             })
+        except ImportError:
+             print("ML Logic not found for direct backtest. Fallback mode.")
+             await manager.broadcast({
+                 "type": "backtest_error",
+                 "ticker": ticker,
+                 "error": "ML Service direct logic missing (ImportError)"
+             })
                 
     except Exception as e:
         print(f"Backtest failed: {e}")
@@ -56,9 +56,12 @@ async def retrain_model_background(ticker: str):
         from ..services.ml_service import ml_service
         # Sanitize ticker
         clean_ticker = ticker.split("/")[0].upper()
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            url = f"{ml_service.base_url}/retrain/{clean_ticker}"
-            await client.post(url)
+        # Direct retraining call
+        try:
+             from ml_service.app.main import retrain_model
+             await retrain_model(clean_ticker)
+        except ImportError:
+             print("ML Logic not found for direct retraining.")
     except Exception as e:
         print(f"Retraining failed: {e}")
 
@@ -191,12 +194,12 @@ async def get_market_data(ticker: str, days: int = 365, current_user: UserModel 
         # For history, we don't have a specific mock in MLService yet, but we can call it directly
         # or add it. I'll add a generic request method to MLService if needed.
         # Given the instruction to audit/fix, I'll just use a try/except here too.
-        ml_service_url = f"{settings.ML_SERVICE_URL}/history/{ticker}?days={days}"
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(ml_service_url)
-            if response.status_code != 200:
-                print(f"Failed to fetch market data: {response.status_code}. Returning empty.")
-                return []
-            return response.json()
+        # Direct history call
+        try:
+             from ml_service.app.main import get_history
+             return await get_history(ticker, days=days)
+        except ImportError:
+             print(f"Failed to fetch market data: ImportError. Returning empty.")
+             return []
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")

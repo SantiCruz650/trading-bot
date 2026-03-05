@@ -8,7 +8,7 @@ alembic
 python-jose[cryptography]
 passlib[bcrypt]
 bcrypt
-ccxt
+ccxt==4.2.19
 requests
 httpx
 aiohttp
