@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from ..db.session import get_db
@@ -34,9 +34,7 @@ class TradeResponse(BaseModel):
     stop_loss: Optional[float]
     take_profit: Optional[float]
     created_at: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class AlertResponse(BaseModel):
     id: int
@@ -44,9 +42,7 @@ class AlertResponse(BaseModel):
     target_price: float
     condition: str
     is_active: bool
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # --- Endpoints ---
 

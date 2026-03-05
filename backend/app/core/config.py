@@ -25,7 +25,7 @@ class Settings(BaseSettings):
 
     # Services
     # ML service base URL (Environment variables take precedence)
-    ML_SERVICE_URL: str = "http://127.0.0.1:8001"
+    ML_SERVICE_URL: str = "DIRECT_PYTHON_IMPORT"
     FRONTEND_URL: str = "https://santicruz650.github.io"
     NGROK_URL: str = "" # Optional override
     

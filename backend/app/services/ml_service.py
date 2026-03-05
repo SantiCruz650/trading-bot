@@ -1,21 +1,30 @@
-import httpx
 import logging
 import asyncio
+import sys
+import os
+from pathlib import Path
 from typing import Dict, Any, Optional
 from app.core.config import settings
+
+# Add the project root to sys.path to reach ml_service and shared
+root_path = str(Path(__file__).resolve().parents[3])
+if root_path not in sys.path:
+    sys.path.append(root_path)
 
 logger = logging.getLogger(__name__)
 
 class MLService:
     """
-    Centralized client for ML Service interactions.
-    Implements timeouts, retries, and safety mocks.
+    Direct Python integration for ML Service.
+    Eliminates internal HTTP calls (404/Connection Refused) on Render.
     """
     
     def __init__(self):
         self.base_url = settings.ML_SERVICE_URL
-        self.timeout = 60.0
-        self.max_retries = 3
+        
+        # Lazy imports to avoid circular dependencies and overhead
+        self._predict_func = None
+        self._get_metrics_func = None
         
         # Safety Mocks (Fallback Data)
         self.DEFAULT_METRICS = {
@@ -26,15 +35,25 @@ class MLService:
             "win_rate": 0.55,
             "trend_strength": 0.0,
             "shs": 0,
-            "status": "offline_fallback"
+            "status": "direct_import"
         }
         
         self.DEFAULT_PREDICTION = {
             "signal": "HOLD",
             "confidence": 0.5,
             "regime": "N/A",
-            "status": "offline_fallback"
+            "status": "direct_import"
         }
+
+    def _ensure_imported(self):
+        if self._predict_func is None:
+            try:
+                from ml_service.app.main import predict, get_metrics
+                self._predict_func = predict
+                self._get_metrics_func = get_metrics
+                logger.info("✅ ML Logic fused directly into Backend Service.")
+            except ImportError as e:
+                logger.error(f"❌ Failed to import ML logic: {e}")
 
     def _sanitize_ticker(self, ticker: str) -> str:
         """Extract base ticker from pair (e.g., 'ETH/USDT' -> 'ETH')"""
@@ -43,63 +62,41 @@ class MLService:
         return ticker.split("/")[0].upper()
 
     async def get_metrics_async(self, ticker: str) -> Dict[str, Any]:
-        """Async fetch for dashboard/proxy"""
-        clean_ticker = self._sanitize_ticker(ticker)
-        url = f"{self.base_url}/metrics/{clean_ticker}"
-        return await self._request_with_retry_async("GET", url, fallback=self.DEFAULT_METRICS)
+        """Direct call to ML logic"""
+        self._ensure_imported()
+        if not self._get_metrics_func:
+            return self.DEFAULT_METRICS
+        
+        try:
+            clean_ticker = self._sanitize_ticker(ticker)
+            return await self._get_metrics_func(clean_ticker)
+        except Exception as e:
+            logger.error(f"ML Metrics Logic Error: {e}")
+            return self.DEFAULT_METRICS
 
     async def get_prediction_async(self, ticker: str) -> Dict[str, Any]:
-        """Async fetch for predictions API"""
-        clean_ticker = self._sanitize_ticker(ticker)
-        url = f"{self.base_url}/predict/{clean_ticker}"
-        return await self._request_with_retry_async("GET", url, fallback=self.DEFAULT_PREDICTION)
+        """Direct call to ML logic"""
+        self._ensure_imported()
+        if not self._predict_func:
+            return self.DEFAULT_PREDICTION
+        
+        try:
+            clean_ticker = self._sanitize_ticker(ticker)
+            return await self._predict_func(clean_ticker)
+        except Exception as e:
+            logger.error(f"ML Prediction Logic Error: {e}")
+            return self.DEFAULT_PREDICTION
 
     def get_metrics_sync(self, ticker: str) -> Dict[str, Any]:
-        """Sync fetch for StrategyEngine"""
-        clean_ticker = self._sanitize_ticker(ticker)
-        url = f"{self.base_url}/metrics/{clean_ticker}"
-        return self._request_with_retry_sync("GET", url, fallback=self.DEFAULT_METRICS)
+        """Wrapper for sync contexts if needed"""
+        return asyncio.run(self.get_metrics_async(ticker))
 
     def get_prediction_sync(self, ticker: str) -> Dict[str, Any]:
-        """Sync fetch for StrategyEngine logic if needed"""
-        clean_ticker = self._sanitize_ticker(ticker)
-        url = f"{self.base_url}/predict/{clean_ticker}"
-        return self._request_with_retry_sync("GET", url, fallback=self.DEFAULT_PREDICTION)
+        """Wrapper for sync contexts if needed"""
+        return asyncio.run(self.get_prediction_async(ticker))
 
-    async def _request_with_retry_async(self, method: str, url: str, fallback: Any, **kwargs) -> Any:
-        for attempt in range(self.max_retries):
-            try:
-                async with httpx.AsyncClient(timeout=self.timeout) as client:
-                    response = await client.request(method, url, **kwargs)
-                    if response.status_code == 200:
-                        return response.json()
-                    logger.warning(f"ML Service returned {response.status_code} for {url} (Attempt {attempt+1})")
-            except (httpx.RequestError, asyncio.TimeoutError) as e:
-                logger.warning(f"ML Service Request Failed: {str(e)} (Attempt {attempt+1})")
-            
-            if attempt < self.max_retries - 1:
-                await asyncio.sleep(0.5 * (attempt + 1))
-        
-        logger.error(f"ML Service Unreachable after {self.max_retries} attempts. Returning fallback for {url}")
-        return fallback
-
-    def _request_with_retry_sync(self, method: str, url: str, fallback: Any, **kwargs) -> Any:
-        import time
-        for attempt in range(self.max_retries):
-            try:
-                with httpx.Client(timeout=self.timeout) as client:
-                    response = client.request(method, url, **kwargs)
-                    if response.status_code == 200:
-                        return response.json()
-                    logger.warning(f"ML Service (Sync) returned {response.status_code} for {url} (Attempt {attempt+1})")
-            except (httpx.RequestError) as e:
-                logger.warning(f"ML Service (Sync) Request Failed: {str(e)} (Attempt {attempt+1})")
-            
-            if attempt < self.max_retries - 1:
-                time.sleep(0.5 * (attempt + 1))
-        
-        logger.error(f"ML Service (Sync) Unreachable. Returning fallback for {url}")
-        return fallback
+# Singleton instance
+ml_service = MLService()
 
 # Singleton instance
 ml_service = MLService()

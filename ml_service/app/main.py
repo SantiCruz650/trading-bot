@@ -36,7 +36,7 @@ MODELS_CACHE = {}
 DATA_CACHE = {} # Cache for market data
 LABEL_ENCODERS = {}
 SCALERS = {} # For LSTM scaling
-MODELS_DIR = Path("/home/santiagomiguelcruz/trading-bot/ml_service/models")
+MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
 MODELS_DIR.mkdir(exist_ok=True)
 
 # Initialize VADER analyzer

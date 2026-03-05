@@ -3,9 +3,13 @@ console.log('--- VERSION 2.0 - CONEXION REPARADA ---');
  * api.js - Wrapper para fetch con autenticación
  */
 
+// HARDCODED PRODUCTION URL - Eliminamos detección dinámica para máxima estabilidad
+const API_BASE_URL = "https://trading-bot-kea3.onrender.com/api";
+window.API_BASE_URL = API_BASE_URL;
+
 const api = {
     async request(endpoint, options = {}) {
-        const token = auth.getToken();
+        const token = localStorage.getItem("access_token");
 
         const defaultHeaders = {
             'Content-Type': 'application/json',
@@ -18,7 +22,6 @@ const api = {
 
         const config = {
             ...options,
-            credentials: 'include', // Para soporte opcional de cookies/sesión
             headers: {
                 ...defaultHeaders,
                 ...options.headers
@@ -30,17 +33,9 @@ const api = {
 
             if (response.status === 401) {
                 console.info("[API Security] 401 Unauthorized. Triggering system lockdown.");
-
-                // Clear state
                 localStorage.removeItem('access_token');
                 if (window.stopPolling) window.stopPolling();
-                window.authState = "unauthenticated";
-
-                // If the app is initialized, force navigation
-                if (window.ui && window.ui.navigate) {
-                    window.ui.navigate('auth');
-                }
-
+                window.location.hash = "#auth";
                 return { authenticated: false };
             }
 
@@ -60,4 +55,3 @@ const api = {
 
 // Exponer globalmente
 window.api = api;
-window.API_BASE_URL = API_BASE_URL;

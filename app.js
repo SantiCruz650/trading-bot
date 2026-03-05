@@ -26,11 +26,11 @@ async function startApp() {
     if (APP.initialized) return;
     APP.initialized = true;
 
-    // --- FORZAR MANUAL (UNA VEZ) ---
-    if (!localStorage.getItem('manualV2_forced')) {
-        console.warn("[System] Clearing localStorage to force Onboarding Manual...");
+    // --- FORZAR MANUAL (VERSION 2.0) ---
+    if (!localStorage.getItem('manualV2_forced_v2')) {
+        console.warn("[System] Critical Refresh: Clearing localStorage for v2 alignment...");
         localStorage.clear();
-        localStorage.setItem('manualV2_forced', 'true');
+        localStorage.setItem('manualV2_forced_v2', 'true');
     }
 
     console.info("[App] Booting Terminal...");
