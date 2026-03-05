@@ -1,8 +1,4 @@
-window.API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? `http://${window.location.hostname}:8000/api`
-    : (window.location.hostname === 'santicruz650.github.io')
-        ? (localStorage.getItem('FORCED_API_URL') || "https://mcrypto-api.ngrok-free.app/api")
-        : "/api";
+window.API_BASE_URL = "https://trading-bot-kea3.onrender.com/api";
 
 const auth = {
     saveToken(token) {
