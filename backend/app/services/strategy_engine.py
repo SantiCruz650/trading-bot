@@ -26,8 +26,16 @@ class StrategyEngine:
         if not config_path.exists():
              config_path = Path(__file__).resolve().parent.parent / "etapa2b.yaml"
              
-        with open(config_path, 'r') as f:
-            self.config_2b = yaml.safe_load(f)
+        self.config_2b = {}
+        if config_path.exists():
+            try:
+                with open(config_path, 'r') as f:
+                    self.config_2b = yaml.safe_load(f) or {}
+                logger.info(f"✅ Loaded ETAPA 2B config from {config_path}")
+            except Exception as e:
+                logger.error(f"❌ Error loading {config_path}: {e}. using defaults.")
+        else:
+            logger.warning("⚠️ etapa2b.yaml not found. Using default internal engine settings.")
             
         self.ar_dca_engine = ARDCAEngine(self.config_2b.get("ar_dca", {}))
         self.rotation_engine = RotationEngine(self.config_2b.get("rotation", {}))
