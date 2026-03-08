@@ -334,7 +334,7 @@ class StrategyEngine:
                     return None
                 
                 # Log for ML Evaluation
-                from core.ml_evaluator import MLEvaluator
+                from app.core.ml_evaluator import MLEvaluator
                 evaluator = MLEvaluator()
                 # Calculate current drawdown for logging
                 ath = params.get("equity_ath", current_balance + (total_eth * current_price))
@@ -357,7 +357,7 @@ class StrategyEngine:
         # If we reached here, either can_buy was False or should_buy was False
         # If it was blocked by ML (block_reason exists) and algo wanted to buy (balance >= 100)
         if block_reason and current_balance >= 100:
-            from core.ml_evaluator import MLEvaluator
+            from app.core.ml_evaluator import MLEvaluator
             evaluator = MLEvaluator()
             # Calculate current drawdown for logging
             ath = params.get("equity_ath", current_balance + (total_eth * current_price))

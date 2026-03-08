@@ -1,6 +1,7 @@
-import sys
-from pathlib import Path
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
 
 # 1. Enforce .env existence
 env_path = Path(__file__).resolve().parent.parent / ".env"
