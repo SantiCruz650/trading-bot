@@ -1,4 +1,5 @@
-console.log('--- VERSION 2.2 - DEBUG MODE ---');
+alert('VERSION 2.4 CARGADA');
+console.log('--- VERSION 2.4 - FORCE DEBUG ---');
 /**
  * MCrypto v2 - Professional Trading Terminal
  * Architecture: APP CONTROLLER (Stricter Stabilization)
@@ -20,7 +21,22 @@ window.APP = {
 };
 
 // 2. BOOTLOADER
-document.addEventListener("DOMContentLoaded", startApp);
+// FORCE: Remove loading guard immediately, don't wait for backend
+document.addEventListener("DOMContentLoaded", () => {
+    const guard = document.getElementById('loading-guard');
+    if (guard) {
+        console.warn('[DEBUG] Removing loading-guard from DOM immediately.');
+        guard.remove();
+    }
+
+    // Log existence of key elements
+    console.log('Manual existe:', !!document.getElementById('manual-container'));
+    console.log('Dashboard existe:', !!document.getElementById('dashboard-content'));
+    console.log('Auth existe:', !!document.getElementById('auth-container'));
+    console.log('Trades list existe:', !!document.getElementById('trades-list'));
+
+    startApp();
+});
 
 async function startApp() {
     if (APP.initialized) return;
@@ -73,6 +89,22 @@ async function startApp() {
         APP.state = "UNAUTHENTICATED";
         navigate("auth");
     }
+}
+
+// DEBUG: Force show all major sections
+function forceShowAll() {
+    console.warn('[DEBUG] forceShowAll() called');
+    const ids = ['manual-container', 'dashboard-content', 'auth-container', 'user-profile'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.setProperty('display', 'block', 'important');
+            el.style.setProperty('opacity', '1', 'important');
+            console.log(`[DEBUG] Force-showed #${id}`);
+        } else {
+            console.error(`[DEBUG] NOT FOUND: #${id}`);
+        }
+    });
 }
 
 // 3. DASHBOARD CONTROLLER
