@@ -62,10 +62,13 @@ async function startApp() {
                 navigate("manual");
             }
         } else {
-            throw new Error("Invalid session");
+            console.warn("[App] Session invalid or unauthenticated.");
+            localStorage.removeItem("access_token");
+            APP.state = "UNAUTHENTICATED";
+            navigate("auth");
         }
     } catch (err) {
-        console.warn("[App] Auth verification failed:", err.message);
+        console.error("[App] Auth verification error:", err.message);
         localStorage.removeItem("access_token");
         APP.state = "UNAUTHENTICATED";
         navigate("auth");
