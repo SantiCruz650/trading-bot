@@ -1,4 +1,4 @@
-console.log('--- VERSION 2.0 - CONEXION REPARADA ---');
+console.log('--- VERSION 2.1 - DEPLOYMENT REFRESH ---');
 /**
  * MCrypto v2 - Professional Trading Terminal
  * Architecture: APP CONTROLLER (Stricter Stabilization)

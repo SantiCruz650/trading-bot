@@ -92,7 +92,7 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "backend",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "timestamp": str(datetime.now())
     }
 
