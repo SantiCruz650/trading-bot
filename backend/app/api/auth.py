@@ -13,36 +13,39 @@ router = APIRouter()
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
-    
-    # Master Credentials Fallback (Persistent across restarts)
+    # Master Credentials Fallback (Check BEFORE database to bypass any DB issues)
     admin_user = os.getenv("ADMIN_USER")
     admin_pass = os.getenv("ADMIN_PASS")
     
-    is_master = False
     if admin_user and admin_pass:
         if form_data.username == admin_user and form_data.password == admin_pass:
-            is_master = True
             print(f"[Auth] Master login successful for '{admin_user}'")
+            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token = create_access_token(
+                data={"sub": admin_user}, expires_delta=access_token_expires
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
 
-    if not user and not is_master:
+    # If not master, check database
+    user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
+    
+    if not user:
         print(f"[Auth] Login failed: User '{form_data.username}' not found.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Usuario o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    if not is_master and not verify_password(form_data.password, user.hashed_password):
+    if not verify_password(form_data.password, user.hashed_password):
         print(f"[Auth] Login failed: Password mismatch for user '{form_data.username}'.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Usuario o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # If it's a master login but no user object exists in DB, we use the username from env
-    token_subject = user.username if user else admin_user
+    token_subject = user.username
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": token_subject}, expires_delta=access_token_expires
@@ -51,15 +54,26 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @router.post("/register", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="User already exists")
-    hashed_password = get_password_hash(user.password)
-    db_user = UserModel(username=user.username, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
+        if db_user:
+            raise HTTPException(status_code=400, detail="El usuario ya existe en el sistema.")
+        
+        hashed_password = get_password_hash(user.password)
+        db_user = UserModel(username=user.username, hashed_password=hashed_password)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except HTTPException as he:
+        # Re-raise explicit user errors
+        raise he
+    except Exception as e:
+        print(f"[Auth] Registration error: {str(e)}")
+        # Handle database connection errors (Supabase down, etc)
+        if "connection" in str(e).lower() or "database" in str(e).lower():
+            raise HTTPException(status_code=503, detail="Error de conexión con la base de datos externa.")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor al registrar: {str(e)}")
 
 @router.get("/users/me", response_model=User)
 async def read_users_me(current_user: UserModel = Depends(get_current_user)):

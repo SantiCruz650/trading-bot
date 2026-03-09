@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from pathlib import Path
@@ -12,8 +13,8 @@ class Settings(BaseSettings):
         "extra": "ignore"
     }
 
-    # Database
-    DATABASE_URL: str = f"sqlite:////home/santiagomiguelcruz/trading-bot/backend/tradingbot.db"
+    # Database: Use DATABASE_URL from env (Supabase/Render) or fallback to local SQLite
+    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:////home/santiagomiguelcruz/trading-bot/backend/tradingbot.db")
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
