@@ -36,40 +36,46 @@ async function startApp() {
 
     console.info("[App] Booting Terminal...");
 
-    // --- MANUAL / ONBOARDING (ALWAYS SHOW TEMPORARILY) ---
-    console.info("--- FORZANDO RENDERIZADO DE MANUAL ---");
-    APP.state = "ONBOARDING";
-    navigate("manual");
-
-    showLoadingScreen("Verificando sesión...");
-
     const token = localStorage.getItem("access_token");
 
     if (!token) {
-        console.info("[App] No session token found.");
-        // We stay in ONBOARDING if needed, but navigate will clear it if called
-        // However, if we are in ONBOARDING, we might want to stay there
+        console.info("[App] No session token found. Redirecting to auth.");
+        APP.state = "UNAUTHENTICATED";
+        navigate("auth");
         return;
     }
+
+    showLoadingScreen("Verificando sesión...");
 
     try {
         const user = await api.request("/auth/verify");
         if (user && user.authenticated !== false) {
             APP.user = user;
+
+            // Critical Rule 2.0: Check manual status before dashboard
+            if (localStorage.getItem("manualAccepted") === "true") {
+                console.info("[App] Session valid. Starting Dashboard...");
+                startDashboard();
+            } else {
+                console.info("[App] Session valid but manual pending.");
+                APP.state = "ONBOARDING";
+                navigate("manual");
+            }
         } else {
             throw new Error("Invalid session");
         }
     } catch (err) {
         console.warn("[App] Auth verification failed:", err.message);
         localStorage.removeItem("access_token");
-        return;
+        APP.state = "UNAUTHENTICATED";
+        navigate("auth");
     }
-
-    // Usually we would check manualAccepted here, but now it's forced at top
 }
 
 // 3. DASHBOARD CONTROLLER
 function startDashboard() {
+    console.info("[App] Switching to DASHBOARD mode.");
+    APP.state = "DASHBOARD";
     renderDashboard();
     startPolling();
 }
@@ -219,7 +225,22 @@ async function refreshData() {
             try {
                 executions = await api.request(`/strategies/${data.strategies[0].id}/executions`);
             } catch (e) {
-                console.warn("[Data] Executions fail.");
+                console.warn("[Data] Strategy executions fail.");
+            }
+        } else {
+            // FALLBACK: Load general paper trades if no strategies exist
+            try {
+                console.info("[Data] No active strategies. Fetching general trades...");
+                const trades = await api.request('/trading/trades');
+                // Map PaperTrade model to execution display format
+                executions = (trades || []).map(t => ({
+                    order_type: t.type,
+                    amount: t.amount,
+                    price: t.price,
+                    timestamp: t.created_at
+                }));
+            } catch (err) {
+                console.warn("[Data] Trades fallback fail:", err.message);
             }
         }
 

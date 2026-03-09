@@ -49,7 +49,7 @@ const auth = {
         params.append('password', password);
 
         // OAuth2 standard expects application/x-www-form-urlencoded
-        const response = await fetch(`${window.API_BASE_URL}/auth/token`, {
+        const response = await fetch(`${window.API_BASE_URL}/api/auth/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -69,7 +69,7 @@ const auth = {
     },
 
     async register(username, password) {
-        const response = await fetch(`${window.API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${window.API_BASE_URL}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

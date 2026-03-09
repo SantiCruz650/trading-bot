@@ -29,7 +29,8 @@ const api = {
         };
 
         try {
-            const response = await fetch(`${window.API_BASE_URL}${endpoint}`, config);
+            const apiEndpoint = endpoint.startsWith('/api') ? endpoint : `/api${endpoint}`;
+            const response = await fetch(`${window.API_BASE_URL}${apiEndpoint}`, config);
 
             if (response.status === 401) {
                 console.info("[API Security] 401 Unauthorized. Triggering system lockdown.");
