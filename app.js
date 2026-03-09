@@ -1,4 +1,4 @@
-console.log('--- VERSION 2.1 - DEPLOYMENT REFRESH ---');
+console.log('--- VERSION 2.2 - DEBUG MODE ---');
 /**
  * MCrypto v2 - Professional Trading Terminal
  * Architecture: APP CONTROLLER (Stricter Stabilization)
@@ -157,8 +157,23 @@ window.navigate = navigate; // Allow global access for api.js
 window.ui = { navigate: navigate }; // Compatibility with api.js
 
 function showLoadingScreen(msg) {
+    console.info(`[System] ${msg}`);
     if (els.loadingGuard) {
-        els.loadingGuard.querySelector('p').textContent = msg;
+        const p = els.loadingGuard.querySelector('p');
+        if (p) p.textContent = msg;
+
+        // Visual Logger for User Debugging
+        let debugLog = els.loadingGuard.querySelector('.debug-log');
+        if (!debugLog) {
+            debugLog = document.createElement('div');
+            debugLog.className = 'debug-log';
+            debugLog.style.fontSize = '10px';
+            debugLog.style.marginTop = '10px';
+            debugLog.style.color = '#888';
+            els.loadingGuard.querySelector('.loader-content').appendChild(debugLog);
+        }
+        debugLog.textContent = `Log: ${msg} (${new Date().toLocaleTimeString()})`;
+
         navigate('loading');
     }
 }
@@ -419,7 +434,7 @@ async function sendAction(endpoint, method = "POST", body = null) {
 
 els.btnStart.addEventListener('click', () => sendAction("/trading/start"));
 els.btnStop.addEventListener('click', () => sendAction("/trading/stop"));
-els.btnKill.addEventListener('click', () => sendAction("/trading/kill-switch"));
+els.btnKill.addEventListener('click', () => sendAction("/trading/kill"));
 els.navManual.addEventListener('click', () => navigate('manual'));
 if (els.btnResetManual) {
     els.btnResetManual.addEventListener('click', () => {
