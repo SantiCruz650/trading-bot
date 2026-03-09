@@ -1,4 +1,4 @@
-window.API_BASE_URL = "https://trading-bot-kea3.onrender.com/api";
+window.API_BASE_URL = "https://trading-bot-kea3.onrender.com";
 
 const auth = {
     saveToken(token) {

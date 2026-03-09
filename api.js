@@ -4,7 +4,7 @@ console.log('--- VERSION 2.0 - CONEXION REPARADA ---');
  */
 
 // HARDCODED PRODUCTION URL - Eliminamos detección dinámica para máxima estabilidad
-const API_BASE_URL = "https://trading-bot-kea3.onrender.com/api";
+const API_BASE_URL = "https://trading-bot-kea3.onrender.com";
 window.API_BASE_URL = API_BASE_URL;
 
 const api = {
