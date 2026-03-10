@@ -36,8 +36,10 @@ from .api import auth_router, predictions_router, proxy_router, trading, control
 from .db.session import engine
 from .models.models import Base
 
-# Create database tables
+# Create database tables (Ensuring tables exist in Supabase/PostgreSQL)
+print("[Boot] Syncing database schemas...")
 Base.metadata.create_all(bind=engine)
+print("[Boot] Database tables verified/created.")
 
 def seed_default_strategy():
     """Ensure at least one ETH strategy exists for the first user."""

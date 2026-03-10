@@ -11,9 +11,49 @@ from ..db.session import get_db
 
 router = APIRouter()
 
+import json
+
+BACKUP_USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../users_backup.json")
+
+def save_user_fallback(username, hashed_password):
+    """Save user to a local JSON file if database is down."""
+    try:
+        users = {}
+        if os.path.exists(BACKUP_USERS_FILE):
+            with open(BACKUP_USERS_FILE, "r") as f:
+                users = json.load(f)
+        
+        users[username] = {"hashed_password": hashed_password, "first_login": True}
+        
+        with open(BACKUP_USERS_FILE, "w") as f:
+            json.dump(users, f)
+        print(f"[Auth] Fallback: User '{username}' saved to local JSON backup.")
+        return True
+    except Exception as e:
+        print(f"[Auth] Fallback CRITICAL ERROR: Could not save to JSON: {e}")
+        return False
+
+def check_user_fallback(username, password):
+    """Check if user exists in local JSON backup."""
+    try:
+        if not os.path.exists(BACKUP_USERS_FILE):
+            return None
+            
+        with open(BACKUP_USERS_FILE, "r") as f:
+            users = json.load(f)
+            
+        if username in users:
+            user_data = users[username]
+            if verify_password(password, user_data["hashed_password"]):
+                # Return a mock user object that matches the schema
+                return {"username": username, "id": -1, "first_login": user_data.get("first_login", True)}
+    except Exception as e:
+        print(f"[Auth] Fallback check error: {e}")
+    return None
+
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # Master Credentials Fallback (Check BEFORE database to bypass any DB issues)
+    # 1. Master Credentials Fallback
     admin_user = os.getenv("ADMIN_USER")
     admin_pass = os.getenv("ADMIN_PASS")
     
@@ -26,35 +66,40 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             )
             return {"access_token": access_token, "token_type": "bearer"}
 
-    # If not master, check database
-    user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
-    
-    if not user:
-        print(f"[Auth] Login failed: User '{form_data.username}' not found.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario o contraseña incorrectos",
-            headers={"WWW-Authenticate": "Bearer"},
+    # 2. Database Lookup
+    try:
+        user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
+        if user and verify_password(form_data.password, user.hashed_password):
+            token_subject = user.username
+            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token = create_access_token(
+                data={"sub": token_subject}, expires_delta=access_token_expires
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
+    except Exception as e:
+        print(f"[Auth] Database login failed, trying local fallback. Error: {e}")
+
+    # 3. Local JSON Fallback (Backup)
+    fallback_user = check_user_fallback(form_data.username, form_data.password)
+    if fallback_user:
+        print(f"[Auth] Login successful via Local JSON Backup for '{form_data.username}'")
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": form_data.username}, expires_delta=access_token_expires
         )
-    
-    if not verify_password(form_data.password, user.hashed_password):
-        print(f"[Auth] Login failed: Password mismatch for user '{form_data.username}'.")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario o contraseña incorrectos",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    token_subject = user.username
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": token_subject}, expires_delta=access_token_expires
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    # Final Failure
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Usuario o contraseña incorrectos",
+        headers={"WWW-Authenticate": "Bearer"},
     )
-    return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
+        # Check database
         db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
         if db_user:
             raise HTTPException(status_code=400, detail="El usuario ya existe en el sistema.")
@@ -64,13 +109,19 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
+        print(f"[Auth] User '{user.username}' registered successfully in Database.")
         return db_user
     except HTTPException as he:
-        # Re-raise explicit user errors
         raise he
     except Exception as e:
-        print(f"[Auth] Registration error: {str(e)}")
-        # Handle database connection errors (Supabase down, etc)
+        print(f"[Auth] Registration CRITICAL DB Error: {str(e)}")
+        
+        # Emergency Fallback to Local JSON
+        hashed_password = get_password_hash(user.password)
+        if save_user_fallback(user.username, hashed_password):
+            # Return a mock user object to satisfy the frontend
+            return {"id": -1, "username": user.username, "first_login": True}
+            
         if "connection" in str(e).lower() or "database" in str(e).lower():
             raise HTTPException(status_code=503, detail="Error de conexión con la base de datos externa.")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor al registrar: {str(e)}")
