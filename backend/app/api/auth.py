@@ -104,9 +104,15 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     # Final Failure
     print(f"[Auth] ! [401] All authentication vectors failed for '{form_data.username}'")
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Usuario o contraseña incorrectos",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 @router.post("/register", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    print(f"[Auth] Registration attempt for user: '{user.username}'")
     try:
         # Check database
         db_user = db.query(UserModel).filter(UserModel.username == user.username).first()
