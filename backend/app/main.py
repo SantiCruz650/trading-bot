@@ -3,12 +3,12 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from pathlib import Path
 
-# 1. Enforce .env existence
+# 1. Configuration Check
 env_path = Path(__file__).resolve().parent.parent / ".env"
-if not env_path.exists():
-    print(f"CRITICAL ERROR: Configuration file not found at {env_path}")
-    print("El backend NO puede arrancar sin el archivo .env en /backend/.env")
-    sys.exit(1)
+if env_path.exists():
+    logger.info(f"Using configuration file at {env_path}")
+else:
+    logger.info("No .env file found. Falling back to environment variables (Render/Production mode).")
 
 # Add root directory to sys.path to allow importing shared
 sys.path.append(str(Path(__file__).resolve().parents[2]))

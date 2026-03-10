@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     }
 
     # Database: Use DATABASE_URL from env (Supabase/Render) or fallback to local SQLite
-    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:////home/santiagomiguelcruz/trading-bot/backend/tradingbot.db")
+    _db_url: str = os.getenv("DATABASE_URL", f"sqlite:////home/santiagomiguelcruz/trading-bot/backend/tradingbot.db")
+    # Normalize postgres:// to postgresql:// for SQLAlchemy compatibility
+    DATABASE_URL: str = _db_url.replace("postgres://", "postgresql://", 1) if _db_url.startswith("postgres://") else _db_url
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
