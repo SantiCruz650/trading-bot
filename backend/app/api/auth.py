@@ -7,7 +7,7 @@ from datetime import timedelta
 from ..schemas.schemas import Token, User, UserCreate
 from ..models.models import User as UserModel
 from ..auth.auth import create_access_token, get_password_hash, verify_password, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
-from ..db.session import get_db
+from ..db.session import get_db, engine
 
 router = APIRouter()
 
