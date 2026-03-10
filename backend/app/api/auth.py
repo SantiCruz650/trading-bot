@@ -110,6 +110,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+import traceback
+
 @router.post("/register", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     print(f"[Auth] Registration attempt for user: '{user.username}'")
@@ -129,7 +131,8 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     except HTTPException as he:
         raise he
     except Exception as e:
-        print(f"[Auth] Registration CRITICAL DB Error: {str(e)}")
+        error_trace = traceback.format_exc()
+        print(f"[Auth] Registration CRITICAL DB Error:\n{error_trace}")
         
         # Emergency Fallback to Local JSON
         hashed_password = get_password_hash(user.password)
@@ -137,9 +140,21 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
             # Return a mock user object to satisfy the frontend
             return {"id": -1, "username": user.username, "first_login": True}
             
-        if "connection" in str(e).lower() or "database" in str(e).lower():
-            raise HTTPException(status_code=503, detail="Error de conexión con la base de datos externa.")
         raise HTTPException(status_code=500, detail=f"Error interno del servidor al registrar: {str(e)}")
+
+@router.get("/diag")
+def diag_db(db: Session = Depends(get_db)):
+    """Diagnostic endpoint to verify database users."""
+    try:
+        users = db.query(UserModel).all()
+        return {
+            "status": "ok",
+            "db_engine": str(engine.url.drivername),
+            "user_count": len(users),
+            "users": [u.username for u in users]
+        }
+    except Exception as e:
+        return {"status": "error", "detail": str(e), "trace": traceback.format_exc()}
 
 @router.get("/users/me", response_model=User)
 async def read_users_me(current_user: UserModel = Depends(get_current_user)):
