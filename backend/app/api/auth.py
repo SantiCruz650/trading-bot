@@ -53,48 +53,57 @@ def check_user_fallback(username, password):
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    print(f"[Auth] Login attempt for user: '{form_data.username}'")
+    
     # 1. Master Credentials Fallback
     admin_user = os.getenv("ADMIN_USER")
     admin_pass = os.getenv("ADMIN_PASS")
     
     if admin_user and admin_pass:
         if form_data.username == admin_user and form_data.password == admin_pass:
-            print(f"[Auth] Master login successful for '{admin_user}'")
+            print(f"[Auth] -> Master login SUCCESS for '{admin_user}'")
             access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
             access_token = create_access_token(
                 data={"sub": admin_user}, expires_delta=access_token_expires
             )
             return {"access_token": access_token, "token_type": "bearer"}
+        else:
+            print(f"[Auth] -> Master check: No match for '{form_data.username}'")
 
     # 2. Database Lookup
     try:
         user = db.query(UserModel).filter(UserModel.username == form_data.username).first()
-        if user and verify_password(form_data.password, user.hashed_password):
-            token_subject = user.username
-            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-            access_token = create_access_token(
-                data={"sub": token_subject}, expires_delta=access_token_expires
-            )
-            return {"access_token": access_token, "token_type": "bearer"}
+        if user:
+            if verify_password(form_data.password, user.hashed_password):
+                print(f"[Auth] -> Database login SUCCESS for '{user.username}'")
+                token_subject = user.username
+                access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+                access_token = create_access_token(
+                    data={"sub": token_subject}, expires_delta=access_token_expires
+                )
+                return {"access_token": access_token, "token_type": "bearer"}
+            else:
+                print(f"[Auth] -> Database check: WRONG PASSWORD for '{user.username}'")
+        else:
+            print(f"[Auth] -> Database check: User '{form_data.username}' not found.")
     except Exception as e:
-        print(f"[Auth] Database login failed, trying local fallback. Error: {e}")
+        print(f"[Auth] -> Database CRASH: {e}")
 
     # 3. Local JSON Fallback (Backup)
+    print(f"[Auth] Looking into local JSON fallback for '{form_data.username}'...")
     fallback_user = check_user_fallback(form_data.username, form_data.password)
     if fallback_user:
-        print(f"[Auth] Login successful via Local JSON Backup for '{form_data.username}'")
+        print(f"[Auth] -> Local JSON Backup SUCCESS for '{form_data.username}'")
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": form_data.username}, expires_delta=access_token_expires
         )
         return {"access_token": access_token, "token_type": "bearer"}
+    else:
+        print(f"[Auth] -> Local JSON: No match for '{form_data.username}'")
 
     # Final Failure
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Usuario o contraseña incorrectos",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    print(f"[Auth] ! [401] All authentication vectors failed for '{form_data.username}'")
 
 @router.post("/register", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
