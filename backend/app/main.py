@@ -6,9 +6,9 @@ from pathlib import Path
 # 1. Configuration Check
 env_path = Path(__file__).resolve().parent.parent / ".env"
 if env_path.exists():
-    logger.info(f"Using configuration file at {env_path}")
+    print(f"[Boot] Using configuration file at {env_path}")
 else:
-    logger.info("No .env file found. Falling back to environment variables (Render/Production mode).")
+    print("[Boot] No .env file found. Falling back to environment variables (Render/Production mode).")
 
 # Add root directory to sys.path to allow importing shared
 sys.path.append(str(Path(__file__).resolve().parents[2]))
