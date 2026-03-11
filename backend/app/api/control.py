@@ -97,9 +97,24 @@ async def kill_bot():
     risk_mgr = RiskManager()
     risk_mgr._kill_switch_active = True
     risk_mgr._gec_state = "KILL_SWITCH"
-    
     logger.critical("🚨 EMERGENCY KILL SWITCH triggered via Dashboard. Bot LOCKED.")
     return {"message": "🚨 KILL SWITCH ACTIVADO. Bot bloqueado permanentemente hasta reinicio."}
+
+@router.post("/unlock")
+async def unlock_bot():
+    """Unlocks the bot after an EMERGENCY KILL was triggered."""
+    if not polling_service.killed:
+        return {"message": "El bot no está bloqueado."}
+        
+    polling_service.killed = False
+    polling_service.last_action = "STOP"
+    
+    risk_mgr = RiskManager()
+    risk_mgr._kill_switch_active = False
+    risk_mgr._gec_state = "NORMAL"
+    
+    logger.info("🔓 SYSTEM UNLOCKED via Dashboard. Bot can be started again.")
+    return {"message": "🔓 SISTEMA DESBLOQUEADO. Puede iniciar el bot nuevamente."}
 
 @router.get("/debug/engine")
 async def debug_engine_state():

@@ -10,7 +10,7 @@ class MarketSimulator:
     """
     def __init__(self):
         self.prices = {
-            "ETH/USDT": 2500.0,
+            "ETH/USDT": 2036.0,
             "BTC/USDT": 45000.0,
             "BNB/USDT": 300.0
         }
