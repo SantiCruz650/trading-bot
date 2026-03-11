@@ -483,9 +483,13 @@ class RiskManager:
         }
 
     def reset_circuit_breaker(self):
-        """Reset circuit breaker (manual action required)"""
-        logger.warning(f"⚠️ Manual circuit breaker reset requested")
+        """Reset circuit breaker and all risk counters (manual action required)"""
+        logger.warning(f"⚠️ Manual circuit breaker reset requested. Clearing all risk counters.")
         self._freeze_active = False
         self._freeze_reason = None
+        self._kill_switch_active = False
+        self._gec_state = "NORMAL"
+        self._consecutive_losses = 0
+        # Reset peak equity to current to stop drawdown trigger
+        self._daily_peak_equity = self._current_equity
         self.save_state()
-        # Note: Kill-Switch cannot be reset via this method (requires restart)

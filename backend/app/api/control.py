@@ -114,11 +114,9 @@ async def unlock_bot():
     polling_service.last_action = "STOP"
     
     risk_mgr = RiskManager()
-    risk_mgr._kill_switch_active = False
-    risk_mgr._gec_state = "NORMAL"
+    risk_mgr.reset_circuit_breaker()
     
     polling_service.save_state()
-    risk_mgr.save_state()
     
     logger.info("🔓 SYSTEM UNLOCKED via Dashboard. Bot can be started again.")
     return {"message": "🔓 SISTEMA DESBLOQUEADO. Puede iniciar el bot nuevamente."}
