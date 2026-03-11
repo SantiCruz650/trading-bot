@@ -56,7 +56,59 @@ class RiskManager:
                 KILL_SWITCH_CONSECUTIVE_LOSSES = 5
             self.settings = FallbackSettings()
 
+        self.load_state()
         self.initialized = True
+
+    def save_state(self):
+        """Persist current risk state to database."""
+        from app.db.session import SessionLocal
+        from app.models.models import SystemState
+        
+        db = SessionLocal()
+        try:
+            state_data = {
+                "gec_state": self._gec_state,
+                "freeze_active": self._freeze_active,
+                "freeze_reason": self._freeze_reason,
+                "kill_switch_active": self._kill_switch_active,
+                "consecutive_losses": self._consecutive_losses
+            }
+            
+            # Upsert
+            state = db.query(SystemState).filter(SystemState.key == "risk_manager_state").first()
+            if not state:
+                state = SystemState(key="risk_manager_state", value=state_data)
+                db.add(state)
+            else:
+                state.value = state_data
+            
+            db.commit()
+            logger.debug("💾 RiskManager state saved to DB")
+        except Exception as e:
+            logger.error(f"❌ Error saving RiskManager state: {e}")
+        finally:
+            db.close()
+
+    def load_state(self):
+        """Load risk state from database."""
+        from app.db.session import SessionLocal
+        from app.models.models import SystemState
+        
+        db = SessionLocal()
+        try:
+            state = db.query(SystemState).filter(SystemState.key == "risk_manager_state").first()
+            if state and state.value:
+                data = state.value
+                self._gec_state = data.get("gec_state", "NORMAL")
+                self._freeze_active = data.get("freeze_active", False)
+                self._freeze_reason = data.get("freeze_reason")
+                self._kill_switch_active = data.get("kill_switch_active", False)
+                self._consecutive_losses = data.get("consecutive_losses", 0)
+                logger.info(f"📂 RiskManager state loaded from DB: {self._gec_state}")
+        except Exception as e:
+            logger.error(f"❌ Error loading RiskManager state: {e}")
+        finally:
+            db.close()
 
     def calculate_kelly_bet(self, win_prob: float, win_loss_ratio: float = 2.0) -> float:
         """
@@ -175,6 +227,7 @@ class RiskManager:
         # Log state transition
         if old_state != self._gec_state:
             logger.warning(f"⚠️ GEC State Transition: {old_state} → {self._gec_state} | ER={er:.4f} | Timestamp: {datetime.utcnow().isoformat()}")
+            self.save_state()
     
     def get_gec_adjustments(self) -> Dict[str, float]:
         """Get order size and DCA step adjustments based on GEC state."""
@@ -258,6 +311,7 @@ class RiskManager:
         self._freeze_reason = reason
         timestamp = datetime.utcnow().isoformat()
         logger.warning(f"❄️ FREEZE ACTIVATED at {timestamp} - Reason: {reason}")
+        self.save_state()
     
     def _deactivate_freeze(self):
         """Deactivate Freeze mechanism."""
@@ -265,6 +319,7 @@ class RiskManager:
         logger.info(f"✅ FREEZE DEACTIVATED at {timestamp} - Conditions normalized")
         self._freeze_active = False
         self._freeze_reason = None
+        self.save_state()
     
     # ============================================================================
     # ETAPA 2A - Kill-Switch
@@ -328,6 +383,8 @@ class RiskManager:
             self._consecutive_losses += 1
             self._last_cycle_profitable = False
             logger.debug(f"❌ Losing cycle - Consecutive losses: {self._consecutive_losses}")
+        
+        self.save_state()
     
     # ============================================================================
     # Properties
@@ -430,4 +487,5 @@ class RiskManager:
         logger.warning(f"⚠️ Manual circuit breaker reset requested")
         self._freeze_active = False
         self._freeze_reason = None
+        self.save_state()
         # Note: Kill-Switch cannot be reset via this method (requires restart)

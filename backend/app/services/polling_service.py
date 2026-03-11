@@ -22,6 +22,55 @@ class PollingService:
         self.active_mode = None
         self.engine = None  # Will be injected at startup
 
+    def save_state(self):
+        """Persist current polling state to database."""
+        from app.models.models import SystemState
+        
+        db = SessionLocal()
+        try:
+            state_data = {
+                "running": self.running,
+                "killed": self.killed,
+                "active_mode": self.active_mode,
+                "last_action": self.last_action
+            }
+            
+            # Upsert
+            state = db.query(SystemState).filter(SystemState.key == "polling_state").first()
+            if not state:
+                state = SystemState(key="polling_state", value=state_data)
+                db.add(state)
+            else:
+                state.value = state_data
+            
+            db.commit()
+            logger.debug("💾 PollingService state saved to DB")
+        except Exception as e:
+            logger.error(f"❌ Error saving PollingService state: {e}")
+        finally:
+            db.close()
+
+    def load_state(self):
+        """Load polling state from database."""
+        from app.models.models import SystemState
+        
+        db = SessionLocal()
+        try:
+            state = db.query(SystemState).filter(SystemState.key == "polling_state").first()
+            if state and state.value:
+                data = state.value
+                self.killed = data.get("killed", False)
+                self.active_mode = data.get("active_mode", "MOCK")
+                self.last_action = data.get("last_action", "STOP")
+                was_running = data.get("running", False)
+                logger.info(f"📂 Polling state loaded from DB. Killed: {self.killed}, Was Running: {was_running}")
+                return was_running
+        except Exception as e:
+            logger.error(f"❌ Error loading PollingService state: {e}")
+        finally:
+            db.close()
+        return False
+
     async def start(self, mode: str = "MOCK"):
         if self.killed:
             logger.error("❌ Cannot start polling: System KILLED and locked.")
@@ -31,6 +80,7 @@ class PollingService:
         self.start_time = datetime.now()
         self.last_action = "START"
         self.active_mode = mode
+        self.save_state()
         
         from app.core.config import settings
         logger.info(f"🤖 Bot running in {self.active_mode} MODE")
@@ -74,6 +124,7 @@ class PollingService:
     async def stop(self):
         self.running = False
         self.last_action = "STOP"
+        self.save_state()
         if self.task:
             self.task.cancel()
         logger.info("🛑 Polling Service stopped")

@@ -133,14 +133,25 @@ async def startup_event():
     
     # Initialize Strategy Engine (Persistent State)
     from app.services.strategy_engine import StrategyEngine
+    from app.services.risk_manager import RiskManager
+    
+    # Singleton RiskManager loads its state from DB in __init__
+    risk_mgr = RiskManager()
+    logger.info(f"🛡️ Risk Manager state: {risk_mgr.gec_state}")
+
     engine = StrategyEngine()
     
     # Inject Engine into PollingService
     polling_service.engine = engine
     logger.info("📡 Strategy Engine integrated with Polling Service")
     
-    # Start REST polling in background
-    asyncio.create_task(polling_service.start())
+    # Load polling state and auto-resume if it was running
+    was_running = polling_service.load_state()
+    if was_running and not polling_service.killed:
+        logger.info(f"🔄 Auto-resuming polling in mode: {polling_service.active_mode}")
+        asyncio.create_task(polling_service.start(mode=polling_service.active_mode))
+    else:
+        logger.info("⏸️ Polling service waiting for manual start.")
     
     if os.getenv("HEADLESS_MODE") == "true" or True: # Always show in this local setup
         logger.info(f"🤖 Bot running in MODE: {settings.MOCK_EXCHANGE and 'MOCK' or 'PAPER/LIVE'}")

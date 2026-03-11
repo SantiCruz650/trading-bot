@@ -37,7 +37,7 @@ def create_strategy(strategy: StrategyCreate, db: Session = Depends(get_db), cur
     db.refresh(new_strategy)
     return new_strategy
 
-@router.get("/")
+@router.get("")
 def get_strategies(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return db.query(Strategy).filter(Strategy.user_id == current_user.id).all()
 

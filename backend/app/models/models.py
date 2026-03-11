@@ -96,3 +96,10 @@ class LiveTrade(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     
     user = relationship("User")
+
+class SystemState(Base):
+    """Stores global system state (Risk Manager status, Polling status, etc.)"""
+    __tablename__ = "system_state"
+    key = Column(String, primary_key=True, index=True)
+    value = Column(JSON) # Supports complex objects or simple strings/bools
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
