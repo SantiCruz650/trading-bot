@@ -44,23 +44,18 @@ class StrategyEngine:
 
     def evaluate_strategies(self, ticker: str, current_price: float, db: Session):
         """Check all active strategies for this ticker and execute if needed."""
-        # 0. Check Kill Switch
-        if self.risk_governor.risk_manager.kill_switch_active:
-            logger.warning(f"🛑 KILL SWITCH ACTIVE: Strategy evaluation HALTED for {ticker}")
-            return
-            
+        # Heartbeat: Explicitly log ticker activity to verify the loop is running on Render
         strategies = db.query(Strategy).filter(
             Strategy.ticker == ticker, 
             Strategy.status == "ACTIVE"
         ).all()
         
-        if strategies:
-            logger.info(f"🧠 Evaluating {len(strategies)} active strategies for {ticker} @ ${current_price:,.2f}")
-        else:
-            # Heartbeat: Explicitly log 0 strategies to verify the loop is running on Render
-            logger.info(f"💤 Ticker {ticker} checked: 0 active strategies found.")
-        
-        # Explicitly log if no strategies found for ticker (optional for debugging, but let's stick to the requirement)
+        logger.info(f"🔍 [{ticker}] Heartbeat: Price ${current_price:,.2f} | Active Strategies: {len(strategies)}")
+
+        # 0. Check Kill Switch
+        if self.risk_governor.risk_manager.kill_switch_active:
+            logger.warning(f"🛑 KILL SWITCH ACTIVE: Strategy evaluation HALTED for {ticker}")
+            return
         
         results = []
         for strategy in strategies:
