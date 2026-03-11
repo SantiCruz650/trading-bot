@@ -88,6 +88,17 @@ class PollingService:
         
         while self.running:
             try:
+                # ETAPA 4.2 - Multi-worker State Sync
+                # Reload state from DB to catch changes from other workers (e.g., Unlock)
+                self.load_state()
+                from app.services.risk_manager import RiskManager
+                RiskManager().load_state()
+                
+                if self.killed:
+                    logger.warning("🚨 Polling loop active but system is KILLED. Skipping cycle.")
+                    await asyncio.sleep(self.interval)
+                    continue
+
                 # Use settings to determine simulation mode
                 exchange = get_exchange(local_simulation=settings.OBSERVATION_ONLY)
                 
