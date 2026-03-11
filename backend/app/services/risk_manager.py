@@ -6,7 +6,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 class RiskManager:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(RiskManager, cls).__new__(cls)
+            cls._instance.initialized = False
+        return cls._instance
+
     def __init__(self, bankroll: float = 10000.0):
+        if getattr(self, "initialized", False):
+            return
+            
         self.bankroll = bankroll
         self.max_risk_per_trade = 0.05 # Never risk more than 5% of bankroll
         
@@ -44,6 +55,8 @@ class RiskManager:
                 KILL_SWITCH_ER_THRESHOLD = 0.95
                 KILL_SWITCH_CONSECUTIVE_LOSSES = 5
             self.settings = FallbackSettings()
+
+        self.initialized = True
 
     def calculate_kelly_bet(self, win_prob: float, win_loss_ratio: float = 2.0) -> float:
         """
