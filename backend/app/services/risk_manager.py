@@ -223,6 +223,9 @@ class RiskManager:
         if not self.settings.ETAPA_2A_ACTIVE:
             return
         
+        # Reload state in case it was changed by another worker (e.g. Mode toggle)
+        self.load_state()
+        
         er = self.calculate_exposure_ratio()
         old_state = self._gec_state
         
@@ -250,7 +253,7 @@ class RiskManager:
         
         # Log state transition
         if old_state != self._gec_state:
-            logger.warning(f"⚠️ GEC State Transition: {old_state} → {self._gec_state} | ER={er:.4f} | Timestamp: {datetime.utcnow().isoformat()}")
+            logger.warning(f"⚠️ GEC State Transition: {old_state} → {self._gec_state} | Mode: {self._risk_profile} | ER={er:.4f} | Timestamp: {datetime.utcnow().isoformat()}")
             self.save_state()
     
     def get_gec_adjustments(self) -> Dict[str, float]:
@@ -495,6 +498,7 @@ class RiskManager:
 
     def get_daily_stats(self):
         """Get daily risk stats"""
+        self.load_state() # Ensure freshest data for API response
         return {
             "trades": 0,
             "pnl": self._current_equity - self._daily_start_equity,

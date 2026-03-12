@@ -26,6 +26,7 @@ async def update_risk_profile(data: RiskProfileUpdate):
     risk_mgr = RiskManager()
     risk_mgr._risk_profile = data.profile
     risk_mgr.save_state()
+    logger.info(f"🔄 PERFIL DE RIESGO ACTUALIZADO: {data.profile}")
     return {"message": f"Perfil de riesgo actualizado a {data.profile}"}
 logger = logging.getLogger(__name__)
 
