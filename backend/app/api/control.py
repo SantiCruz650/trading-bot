@@ -6,6 +6,7 @@ from datetime import datetime
 from ..models.models import User
 from .auth import get_current_user
 from ..core.config import settings
+from pydantic import BaseModel
 from ..services.polling_service import polling_service
 from ..services.risk_manager import RiskManager
 from ..db.session import SessionLocal
