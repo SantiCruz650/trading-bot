@@ -107,7 +107,8 @@ async def kill_bot():
 @router.post("/unlock")
 async def unlock_bot():
     """Unlocks the bot after an EMERGENCY KILL was triggered."""
-    if not polling_service.killed:
+    risk_mgr = RiskManager()
+    if not polling_service.killed and not risk_mgr.kill_switch_active:
         return {"message": "El bot no está bloqueado."}
         
     polling_service.killed = False
