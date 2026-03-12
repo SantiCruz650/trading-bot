@@ -12,6 +12,20 @@ from ..db.session import SessionLocal
 from ..models.models import Strategy
 
 router = APIRouter()
+
+class RiskProfileUpdate(BaseModel):
+    profile: str
+
+@router.post("/risk-profile")
+async def update_risk_profile(data: RiskProfileUpdate):
+    """Updates the global risk profile (NORMAL/CONSERVATIVE)."""
+    if data.profile not in ["NORMAL", "CONSERVATIVE"]:
+        raise HTTPException(status_code=400, detail="Perfil de riesgo inválido")
+    
+    risk_mgr = RiskManager()
+    risk_mgr._risk_profile = data.profile
+    risk_mgr.save_state()
+    return {"message": f"Perfil de riesgo actualizado a {data.profile}"}
 logger = logging.getLogger(__name__)
 
 @router.post("/start")

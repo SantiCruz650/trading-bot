@@ -26,6 +26,7 @@ class RiskManager:
         self._freeze_active = False
         self._freeze_reason = None
         self._kill_switch_active = False
+        self._risk_profile = "NORMAL"  # NORMAL, CONSERVATIVE
         
         # Daily tracking (reset at midnight)
         self._daily_start_time = datetime.utcnow().date()
@@ -74,7 +75,8 @@ class RiskManager:
                 "consecutive_losses": self._consecutive_losses,
                 "daily_peak_equity": self._daily_peak_equity,
                 "daily_start_equity": self._daily_start_equity,
-                "bankroll": self.bankroll
+                "bankroll": self.bankroll,
+                "risk_profile": self._risk_profile
             }
             
             # Upsert
@@ -110,7 +112,8 @@ class RiskManager:
                 self._daily_peak_equity = data.get("daily_peak_equity", self.bankroll)
                 self._daily_start_equity = data.get("daily_start_equity", self.bankroll)
                 self.bankroll = data.get("bankroll", self.bankroll)
-                logger.info(f"📂 RiskManager state loaded from DB: {self._gec_state}")
+                self._risk_profile = data.get("risk_profile", "NORMAL")
+                logger.info(f"📂 RiskManager state loaded from DB: {self._gec_state} | Mode: {self._risk_profile}")
         except Exception as e:
             logger.error(f"❌ Error loading RiskManager state: {e}")
         finally:
@@ -223,6 +226,14 @@ class RiskManager:
         er = self.calculate_exposure_ratio()
         old_state = self._gec_state
         
+        # Determine thresholds based on risk profile
+        if self._risk_profile == "CONSERVATIVE":
+            hard_cap = self.settings.GEC_HARD_CAP * 0.5  # 15% if default is 30%
+            soft_cap = self.settings.GEC_SOFT_CAP * 0.5  # 10% if default is 20%
+        else:
+            hard_cap = self.settings.GEC_HARD_CAP
+            soft_cap = self.settings.GEC_SOFT_CAP
+
         # Check Kill-Switch conditions first
         if self._should_trigger_kill_switch():
             if self._gec_state != "KILL_SWITCH":
@@ -230,9 +241,9 @@ class RiskManager:
                 self._kill_switch_active = True
                 logger.critical(f"🚨🚨🚨 KILL-SWITCH ACTIVATED at {datetime.utcnow().isoformat()} - Trading HALTED")
                 self._log_kill_switch_trigger()
-        elif er >= self.settings.GEC_HARD_CAP:
+        elif er >= hard_cap:
             self._gec_state = "HARD_CAP"
-        elif er >= self.settings.GEC_SOFT_CAP:
+        elif er >= soft_cap:
             self._gec_state = "SOFT_CAP"
         else:
             self._gec_state = "NORMAL"
