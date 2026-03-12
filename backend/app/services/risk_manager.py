@@ -14,7 +14,7 @@ class RiskManager:
             cls._instance.initialized = False
         return cls._instance
 
-    def __init__(self, bankroll: float = 10000.0):
+    def __init__(self, bankroll: float = 1000.0):
         if getattr(self, "initialized", False):
             return
             
@@ -71,7 +71,10 @@ class RiskManager:
                 "freeze_active": self._freeze_active,
                 "freeze_reason": self._freeze_reason,
                 "kill_switch_active": self._kill_switch_active,
-                "consecutive_losses": self._consecutive_losses
+                "consecutive_losses": self._consecutive_losses,
+                "daily_peak_equity": self._daily_peak_equity,
+                "daily_start_equity": self._daily_start_equity,
+                "bankroll": self.bankroll
             }
             
             # Upsert
@@ -104,6 +107,9 @@ class RiskManager:
                 self._freeze_reason = data.get("freeze_reason")
                 self._kill_switch_active = data.get("kill_switch_active", False)
                 self._consecutive_losses = data.get("consecutive_losses", 0)
+                self._daily_peak_equity = data.get("daily_peak_equity", self.bankroll)
+                self._daily_start_equity = data.get("daily_start_equity", self.bankroll)
+                self.bankroll = data.get("bankroll", self.bankroll)
                 logger.info(f"📂 RiskManager state loaded from DB: {self._gec_state}")
         except Exception as e:
             logger.error(f"❌ Error loading RiskManager state: {e}")
@@ -176,6 +182,13 @@ class RiskManager:
         
         self._current_equity = current_balance + total_position_value
         self._total_position_value = total_position_value
+        
+        # Initialize peak equity on first update if it's still at default 
+        if self._daily_peak_equity == 10000.0 or self._daily_peak_equity == 1000.0:
+            if self._current_equity > 0:
+                 logger.info(f"📈 Initializing peak equity to {self._current_equity}")
+                 self._daily_peak_equity = self._current_equity
+                 self._daily_start_equity = self._current_equity
         
         # Update peak equity
         if self._current_equity > self._daily_peak_equity:
