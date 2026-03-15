@@ -48,9 +48,9 @@ class RiskManager:
         except ImportError:
             # Fallback defaults
             class FallbackSettings:
-                ETAPA_2A_ACTIVE = True
-                GEC_SOFT_CAP = 0.65
-                GEC_HARD_CAP = 0.80
+                ETAPA_2_ACTIVE = True
+                GEC_SOFT_CAP = 0.25 # Lowered from 0.65 (Safety Fallback)
+                GEC_HARD_CAP = 0.40 # Lowered from 0.80 (Safety Fallback)
                 FREEZE_DD_THRESHOLD = 0.015
                 KILL_SWITCH_DD_THRESHOLD = 0.030
                 KILL_SWITCH_ER_THRESHOLD = 0.95
@@ -277,11 +277,18 @@ class RiskManager:
         
         # --- SECURITY AUDIT: Limit Simultaneous Orders ---
         if side.upper() == "BUY":
-            from app.models.models import PaperTrade
-            open_positions_count = db.query(PaperTrade).filter(PaperTrade.status == "OPEN").count()
+            from app.models.models import PaperTrade, LiveTrade
+            # Count Open positions in Paper Trading
+            open_paper_count = db.query(PaperTrade).filter(PaperTrade.status == "OPEN").count()
+            # Count potentially open positions in Live Trading (using 'filled' status as 'open' for now)
+            # In a real scenario, this would check for un-closed positions.
+            open_live_count = db.query(LiveTrade).filter(LiveTrade.status == "filled", LiveTrade.side == "buy").count()
+            
+            total_open = open_paper_count + open_live_count
             max_orders = getattr(self.settings, "MAX_SIMULTANEOUS_ORDERS", 5)
-            if open_positions_count >= max_orders:
-                reason = f"🚫 Límite de órdenes alcanzado: {open_positions_count}/{max_orders} posiciones abiertas."
+            
+            if total_open >= max_orders:
+                reason = f"🚫 Límite global de órdenes alcanzado: {total_open}/{max_orders} (Paper: {open_paper_count}, Live: {open_live_count})"
                 logger.warning(reason)
                 return False, reason
 

@@ -154,23 +154,25 @@ class PollingService:
             db.close()
 
     def _get_accumulated(self, ticker):
-        """Calculate total accumulated asset for a ticker across all strategies."""
+        """Calculate total accumulated asset for a ticker across all strategies using optimized SQL aggregates."""
+        from sqlalchemy import func
         db = SessionLocal()
         try:
             # Join StrategyExecution with Strategy to filter by ticker
-            executions = db.query(StrategyExecution).join(Strategy).filter(
-                Strategy.ticker == ticker
-            ).all()
+            # Optimize by performing calculation at DB level
+            total_buy = db.query(func.sum(StrategyExecution.amount / StrategyExecution.price)).join(Strategy).filter(
+                Strategy.ticker == ticker,
+                StrategyExecution.order_type == "BUY"
+            ).scalar() or 0.0
             
-            total_asset = 0.0
-            for ex in executions:
-                asset_amount = ex.amount / ex.price
-                if ex.order_type == "BUY":
-                    total_asset += asset_amount
-                else:
-                    total_asset -= asset_amount
-            return total_asset
-        except Exception:
+            total_sell = db.query(func.sum(StrategyExecution.amount / StrategyExecution.price)).join(Strategy).filter(
+                Strategy.ticker == ticker,
+                StrategyExecution.order_type == "SELL"
+            ).scalar() or 0.0
+            
+            return total_buy - total_sell
+        except Exception as e:
+            logger.error(f"Error calculating accumulated for {ticker}: {e}")
             return 0.0
         finally:
             db.close()
