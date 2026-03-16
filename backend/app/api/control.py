@@ -39,7 +39,19 @@ async def start_bot(data: dict = None):
                 detail="SISTEMA BLOQUEADO (KILLED). Reinicie el backend físicamente."
             )
 
-    mode = (data or {}).get("mode", "MOCK").upper()
+    # Detect default mode if not specified by frontend
+    if not data or "mode" not in data:
+        if settings.MOCK_EXCHANGE:
+            mode = "MOCK"
+        elif settings.DRY_RUN_REAL_API:
+            mode = "DRY_RUN"
+        elif settings.ENABLE_REAL_TRADING:
+            mode = "LIVE"
+        else:
+            mode = "MOCK" # Fallback
+    else:
+        mode = data.get("mode").upper()
+
     if mode not in ["MOCK", "DRY_RUN", "LIVE"]:
         raise HTTPException(status_code=400, detail="Modo de inicio inválido. Use MOCK, DRY_RUN o LIVE.")
 
