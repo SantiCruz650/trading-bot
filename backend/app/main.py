@@ -51,29 +51,33 @@ Base.metadata.create_all(bind=engine)
 print("[Boot] Database tables verified/created.")
 
 def seed_default_strategy():
-    """Ensure at least one ETH strategy exists for the first user."""
+    """Ensure at least one ETH strategy exists for every user."""
     db = SessionLocal()
     try:
-        user = db.query(User).first()
-        if not user:
-            logger.info("ℹ️ No user found to seed strategy.")
+        users = db.query(User).all()
+        if not users:
+            logger.info("ℹ️ No users found to seed strategies.")
             return
             
         ticker = "ETH/USDT"
-        existing = db.query(Strategy).filter(Strategy.ticker == ticker).first()
-        if not existing:
-            new_strategy = Strategy(
-                user_id=user.id,
-                ticker=ticker,
-                type="DCA",
-                params={"base_order": 10.0, "tp_pct": 1.5},
-                status="ACTIVE"
-            )
-            db.add(new_strategy)
-            db.commit()
-            logger.info(f"🚀 SEED: Created default {ticker} strategy for {user.username}")
-        else:
-            logger.info(f"ℹ️ SEED: Strategy for {ticker} already exists.")
+        for user in users:
+            existing = db.query(Strategy).filter(
+                Strategy.ticker == ticker,
+                Strategy.user_id == user.id
+            ).first()
+            
+            if not existing:
+                new_strategy = Strategy(
+                    user_id=user.id,
+                    ticker=ticker,
+                    type="DCA",
+                    params={"base_order": 2.0, "tp_pct": 1.5},
+                    status="ACTIVE"
+                )
+                db.add(new_strategy)
+                logger.info(f"🚀 SEED: Created default {ticker} strategy for {user.username}")
+        
+        db.commit()
     except Exception as e:
         logger.error(f"❌ SEED Error: {e}")
     finally:

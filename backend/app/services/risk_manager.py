@@ -270,25 +270,32 @@ class RiskManager:
         
         return adjustments
     
-    def can_open_position(self, db, side: str = "BUY") -> Tuple[bool, str]:
+    def can_open_position(self, db, user_id: int, side: str = "BUY") -> Tuple[bool, str]:
         """Check if opening a new position is allowed based on GEC state and limits."""
         if not self.settings.ETAPA_2A_ACTIVE:
             return True, "OK"
         
-        # --- SECURITY AUDIT: Limit Simultaneous Orders ---
+        # --- SECURITY AUDIT: Limit Simultaneous Orders (Per User) ---
         if side.upper() == "BUY":
             from app.models.models import PaperTrade, LiveTrade
             # Count Open positions in Paper Trading
-            open_paper_count = db.query(PaperTrade).filter(PaperTrade.status == "OPEN").count()
-            # Count potentially open positions in Live Trading (using 'filled' status as 'open' for now)
-            # In a real scenario, this would check for un-closed positions.
-            open_live_count = db.query(LiveTrade).filter(LiveTrade.status == "filled", LiveTrade.side == "buy").count()
+            open_paper_count = db.query(PaperTrade).filter(
+                PaperTrade.status == "OPEN",
+                PaperTrade.owner_id == user_id
+            ).count()
+            
+            # Count potentially open positions in Live Trading
+            open_live_count = db.query(LiveTrade).filter(
+                LiveTrade.status == "filled", 
+                LiveTrade.side == "buy",
+                LiveTrade.user_id == user_id
+            ).count()
             
             total_open = open_paper_count + open_live_count
             max_orders = getattr(self.settings, "MAX_SIMULTANEOUS_ORDERS", 5)
             
             if total_open >= max_orders:
-                reason = f"🚫 Límite global de órdenes alcanzado: {total_open}/{max_orders} (Paper: {open_paper_count}, Live: {open_live_count})"
+                reason = f"🚫 Límite de órdenes alcanzado para usuario {user_id}: {total_open}/{max_orders} (Paper: {open_paper_count}, Live: {open_live_count})"
                 logger.warning(reason)
                 return False, reason
 

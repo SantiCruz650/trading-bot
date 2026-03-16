@@ -226,7 +226,7 @@ class StrategyEngine:
         can_buy = True
         
         # ETAPA 2A - Check Risk Manager approval for new position
-        risk_can_open, risk_reason = self.risk_manager.can_open_position(db, "BUY")
+        risk_can_open, risk_reason = self.risk_manager.can_open_position(db, strategy.user_id, "BUY")
         if not risk_can_open:
             print(f"🛡️ ETAPA 2A: BUY blocked - {risk_reason}")
             # If Hard Cap, cancel pending orders (simulated)
