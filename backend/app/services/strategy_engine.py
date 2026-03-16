@@ -140,7 +140,7 @@ class StrategyEngine:
         if paused_until and now < datetime.fromisoformat(paused_until):
             strategy.params = params
             flag_modified(strategy, "params")
-            self.db.commit()
+            db.commit()
             return None
 
         # 3.1 Market Regime Detection
@@ -218,7 +218,7 @@ class StrategyEngine:
             params["cooldown_cycles"] -= 1
             strategy.params = params
             flag_modified(strategy, "params")
-            self.db.commit()
+            db.commit()
             return None
 
         can_buy = True
@@ -232,7 +232,7 @@ class StrategyEngine:
                 print(f"🚫 Hard Cap: Canceling pending BUY orders (simulated)")
             strategy.params = params
             flag_modified(strategy, "params")
-            self.db.commit()
+            db.commit()
             return None
         
         # Dynamic Observation Mode: Force observation if balance is low
@@ -646,20 +646,40 @@ class StrategyEngine:
         )
         db.add(execution)
         
-        # 4. Create Paper Trade record
-        trade = PaperTrade(
-            ticker=strategy.ticker,
-            amount=amount / price,
-            price=price,
-            type=order_type.upper(),
-            status="OPEN" if order_type.upper() == "BUY" else "CLOSED",
-            pnl=(price - avg_buy_price) * (amount / price) if order_type.upper() == "SELL" and avg_buy_price else 0.0,
-            owner_id=strategy.user_id
-        )
-        db.add(trade)
+        # 4. Record Trade in Database
+        from app.models.models import LiveTrade
+        
+        # If real trading is active and Not a local simulation, record as LiveTrade
+        if settings.ENABLE_REAL_TRADING and not settings.OBSERVATION_ONLY:
+             live_trade = LiveTrade(
+                user_id=strategy.user_id,
+                order_id=order.get('id', 'unknown'),
+                symbol=strategy.ticker,
+                side=order_type.lower(),
+                amount=amount / price,
+                price=price,
+                value_usdt=amount,
+                fee=order.get('fee', 0.0),
+                pnl=(price - avg_buy_price) * (amount / price) if order_type.upper() == "SELL" and avg_buy_price else 0.0,
+                status=order.get('status', 'filled')
+            )
+             db.add(live_trade)
+        else:
+            # Create Paper Trade record for simulation/dry run
+            trade = PaperTrade(
+                ticker=strategy.ticker,
+                amount=amount / price,
+                price=price,
+                type=order_type.upper(),
+                status="OPEN" if order_type.upper() == "BUY" else "CLOSED",
+                pnl=(price - avg_buy_price) * (amount / price) if order_type.upper() == "SELL" and avg_buy_price else 0.0,
+                owner_id=strategy.user_id
+            )
+            db.add(trade)
+            
         db.commit()
         
-        return f"Executed {order_type} for {strategy.ticker} at ${price:,.2f} (SIM)"
+        return f"Executed {order_type} for {strategy.ticker} at ${price:,.2f} [{'REAL' if settings.ENABLE_REAL_TRADING else 'SIM'}]"
 
     def _get_global_portfolio_stats(self, db): # Added db for future use
         """Mock global portfolio stats for Risk Governor."""
