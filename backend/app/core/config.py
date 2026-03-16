@@ -35,11 +35,11 @@ class Settings(BaseSettings):
     # Environment
     ENV: str = "production"
     DRY_RUN_REAL_API: bool = True
-    ENABLE_REAL_TRADING: bool = False
-    MOCK_EXCHANGE: bool = True
+    ENABLE_REAL_TRADING: bool = True
+    MOCK_EXCHANGE: bool = False
     
     # Binance
-    BINANCE_TESTNET: bool = True
+    BINANCE_TESTNET: bool = False
     BINANCE_TESTNET_API_KEY: str = ""
     BINANCE_TESTNET_API_SECRET: str = ""
     BINANCE_API_KEY: str = ""
