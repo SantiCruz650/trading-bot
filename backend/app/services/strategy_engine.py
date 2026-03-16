@@ -59,9 +59,11 @@ class StrategyEngine:
         
         results = []
         for strategy in strategies:
+            user_tag = f"[{strategy.user.username}]" if strategy.user else "[Unknown]"
             if strategy.type == "GRID":
                 res = self._evaluate_grid(strategy, current_price, db)
             elif strategy.type == "DCA":
+                logger.info(f"⚡ {user_tag} Evaluating DCA for {ticker}...")
                 res = self._evaluate_dca(strategy, current_price, db)
             
             if res:
@@ -638,6 +640,7 @@ class StrategyEngine:
             print(f"📉 SELL {strategy.ticker} | Price: ${price:,.2f} | ETH Sold: {amount/price:.6f} | Fee: ${order_fee:.4f} | Balance: ${balance_before:,.2f} -> ${balance_after:,.2f} | PnL: {pnl_str} USDT")
 
         # 3. Record Execution
+        user_tag = f"[{strategy.user.username}]" if strategy.user else "[Unknown]"
         execution = StrategyExecution(
             strategy_id=strategy.id,
             order_type=order_type.upper(),
@@ -651,6 +654,7 @@ class StrategyEngine:
         
         # If real trading is active and Not a local simulation, record as LiveTrade
         if settings.ENABLE_REAL_TRADING and not settings.OBSERVATION_ONLY:
+             logger.info(f"🔥 {user_tag} RECORDING LIVE TRADE")
              live_trade = LiveTrade(
                 user_id=strategy.user_id,
                 order_id=order.get('id', 'unknown'),
