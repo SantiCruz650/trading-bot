@@ -182,8 +182,12 @@ async def test_binance_connectivity():
     """Directly tests the Binance API keys configured in settings."""
     import ccxt
     
-    api_key = str(settings.BINANCE_API_KEY).strip()
-    api_secret = str(settings.BINANCE_API_SECRET).strip()
+    def clean_key(val):
+        if not val: return ""
+        return str(val).strip().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "")
+
+    api_key = clean_key(settings.BINANCE_API_KEY)
+    api_secret = clean_key(settings.BINANCE_API_SECRET)
     
     if not api_key or not api_secret:
         return {"error": "API keys are missing in environment variables."}

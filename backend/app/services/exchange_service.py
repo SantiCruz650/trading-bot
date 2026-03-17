@@ -83,13 +83,18 @@ class ExchangeService:
     def _initialize_exchange(self):
         """Initialize Binance exchange connection"""
         try:
-            # Get API credentials from settings and SANITIZE (remove invisible spaces)
+            # Get API credentials from settings and AGGRESSIVELY SANITIZE
+            def clean_key(val):
+                if not val: return ""
+                # Remove all whitespace, newlines, and common "smart" characters from Google Docs/Chat
+                return str(val).strip().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "")
+
             if self.testnet:
-                api_key = str(settings.BINANCE_TESTNET_API_KEY).strip()
-                api_secret = str(settings.BINANCE_TESTNET_API_SECRET).strip()
+                api_key = clean_key(settings.BINANCE_TESTNET_API_KEY)
+                api_secret = clean_key(settings.BINANCE_TESTNET_API_SECRET)
             else:
-                api_key = str(settings.BINANCE_API_KEY).strip()
-                api_secret = str(settings.BINANCE_API_SECRET).strip()
+                api_key = clean_key(settings.BINANCE_API_KEY)
+                api_secret = clean_key(settings.BINANCE_API_SECRET)
             
             if not api_key or not api_secret:
                 logger.warning("Missing API credentials. Defaulting to LOCAL SIMULATION.")
