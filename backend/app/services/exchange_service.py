@@ -112,6 +112,7 @@ class ExchangeService:
                 'enableRateLimit': True,
                 'options': {
                     'defaultType': 'spot',
+                    'adjustForTimeDifference': True, # Crucial for -2015 errors
                 }
             })
             

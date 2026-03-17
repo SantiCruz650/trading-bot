@@ -181,7 +181,14 @@ async def debug_engine_state():
 async def test_binance_connectivity():
     """Directly tests the Binance API keys configured in settings."""
     import ccxt
+    import requests
     
+    # 1. Get current IP to help user with whitelisting
+    try:
+        current_ip = requests.get('https://api.ipify.org', timeout=5).text
+    except Exception as e:
+        current_ip = f"Error detecting IP: {e}"
+
     def clean_key(val):
         if not val: return ""
         return str(val).strip().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "")
@@ -190,32 +197,32 @@ async def test_binance_connectivity():
     api_secret = clean_key(settings.BINANCE_API_SECRET)
     
     if not api_key or not api_secret:
-        return {"error": "API keys are missing in environment variables."}
+        return {"error": "API keys are missing in environment variables.", "current_ip": current_ip}
         
     try:
-        # Diagnostic: Masked check
         masked_key = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else "****"
-        logger.info(f"🧪 MANUAL TEST: Initializing Binance API (Key: {masked_key})")
-
+        
         test_exchange = ccxt.binance({
             'apiKey': api_key,
             'secret': api_secret,
             'enableRateLimit': True,
+            'options': {
+                'defaultType': 'spot', # Added defaultType
+                'adjustForTimeDifference': True, # Crucial for -2015 errors
+            }
         })
-        # Try a simple signed call
         balance = test_exchange.fetch_balance()
         return {
             "success": True,
-            "message": "API Keys verified! Connection successful.",
+            "message": "API Keys verified!",
+            "current_ip": current_ip,
             "key_used": masked_key,
-            "account_type": balance.get('info', {}).get('accountType', 'unknown'),
             "permissions": balance.get('info', {}).get('permissions', [])
         }
     except Exception as e:
-        logger.error(f"🧪 MANUAL TEST FAILED: {e}")
         return {
             "success": False,
-            "error_type": type(e).__name__,
             "error_message": str(e),
-            "hint": "Check if API Key and Secret are correct, have 'Spot' enabled, and IP is Unrestricted."
+            "current_ip": current_ip,
+            "hint": f"Enséñale esta IP {current_ip} a tu amigo para que la ponga en Binance."
         }
