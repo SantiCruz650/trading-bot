@@ -83,19 +83,23 @@ class ExchangeService:
     def _initialize_exchange(self):
         """Initialize Binance exchange connection"""
         try:
-            # Get API credentials from settings
+            # Get API credentials from settings and SANITIZE (remove invisible spaces)
             if self.testnet:
-                api_key = settings.BINANCE_TESTNET_API_KEY
-                api_secret = settings.BINANCE_TESTNET_API_SECRET
+                api_key = str(settings.BINANCE_TESTNET_API_KEY).strip()
+                api_secret = str(settings.BINANCE_TESTNET_API_SECRET).strip()
             else:
-                api_key = settings.BINANCE_API_KEY
-                api_secret = settings.BINANCE_API_SECRET
+                api_key = str(settings.BINANCE_API_KEY).strip()
+                api_secret = str(settings.BINANCE_API_SECRET).strip()
             
             if not api_key or not api_secret:
                 logger.warning("Missing API credentials. Defaulting to LOCAL SIMULATION.")
                 self.local_simulation = True
                 return
             
+            # Diagnostic: Log key metadata safely
+            masked_key = f"{api_key[:4]}...{api_key[-4:]}" if len(api_key) > 8 else "****"
+            logger.info(f"🔑 Initializing Binance API (Key: {masked_key}, Length: {len(api_key)}, Secret Length: {len(api_secret)})")
+
             # Initialize ccxt Binance exchange
             self.exchange = ccxt.binance({
                 'apiKey': api_key,
