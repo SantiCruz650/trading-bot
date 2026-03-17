@@ -26,7 +26,7 @@ def generate_report(date_str=None):
     all_trades = cursor.fetchall()
     
     from app.services.exchange_service import get_exchange
-    exchange = get_exchange(local_simulation=True)
+    exchange = get_exchange(local_simulation=settings.MOCK_EXCHANGE)
     
     initial_balance = 1000.0
     live_balance = exchange.get_balance()

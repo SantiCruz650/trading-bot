@@ -23,7 +23,7 @@ class ExchangeService:
     _instance = None
     _lock = threading.Lock()
 
-    def __new__(cls, testnet: bool = True, local_simulation: bool = True):
+    def __new__(cls, testnet: bool = False, local_simulation: bool = False):
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -31,7 +31,7 @@ class ExchangeService:
                     cls._instance.initialized = False
         return cls._instance
 
-    def __init__(self, testnet: bool = True, local_simulation: bool = True):
+    def __init__(self, testnet: bool = False, local_simulation: bool = False):
         """
         Initialize exchange connection
         
@@ -42,7 +42,8 @@ class ExchangeService:
         if self.initialized:
             return
             
-        # Prioridad a settings
+        # Prioridad a settings. Si local_simulation se pasa como True, se respeta, 
+        # pero por defecto seguimos MOCK_EXCHANGE.
         self.dry_run_real = settings.DRY_RUN_REAL_API
         self.local_simulation = settings.OBSERVATION_ONLY or local_simulation or settings.MOCK_EXCHANGE
         self.testnet = settings.BINANCE_TESTNET
@@ -345,7 +346,7 @@ class ExchangeService:
 # Singleton instance
 _exchange_instance = None
 
-def get_exchange(testnet: bool = True, local_simulation: bool = True) -> ExchangeService:
+def get_exchange(testnet: bool = False, local_simulation: bool = False) -> ExchangeService:
     """Get or create exchange service instance"""
     global _exchange_instance
     if _exchange_instance is None:
