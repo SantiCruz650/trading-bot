@@ -227,7 +227,7 @@ async def test_binance_connectivity():
             "hint": f"Enséñale esta IP {current_ip} a tu amigo para que la ponga en Binance."
         }
 
-@router.post("/debug/emergency-cleanup")
+@router.get("/debug/emergency-cleanup")
 async def emergency_cleanup(db: Session = Depends(get_db)):
     """One-off cleanup to delete 'santi' data and reduce Supabase DB size."""
     from app.models.models import User, Strategy, StrategyExecution, PaperTrade, LiveTrade
@@ -236,6 +236,7 @@ async def emergency_cleanup(db: Session = Depends(get_db)):
     santi_user = db.query(User).filter(User.username.in_(target_usernames)).first()
     
     if not santi_user:
+        logger.warning(f"Cleanup: User 'santi' or 'santiagomiguelcruz' not found.")
         return {"error": "User 'santi' or 'santiagomiguelcruz' not found."}
 
     # 1. Delete Executions
@@ -243,11 +244,20 @@ async def emergency_cleanup(db: Session = Depends(get_db)):
     strategy_ids = [s.id for s in strategies]
     
     if strategy_ids:
-        db.query(StrategyExecution).filter(StrategyExecution.strategy_id.in_(strategy_ids)).delete(synchronize_session=False)
-        db.query(Strategy).filter(Strategy.id.in_(strategy_ids)).delete(synchronize_session=False)
+        exec_count = db.query(StrategyExecution).filter(StrategyExecution.strategy_id.in_(strategy_ids)).delete(synchronize_session=False)
+        strat_count = db.query(Strategy).filter(Strategy.id.in_(strategy_ids)).delete(synchronize_session=False)
+        logger.info(f"Cleanup: Deleted {exec_count} execs and {strat_count} strats for {santi_user.username}")
     
-    db.query(PaperTrade).filter(PaperTrade.owner_id == santi_user.id).delete(synchronize_session=False)
-    db.query(LiveTrade).filter(LiveTrade.user_id == santi_user.id).delete(synchronize_session=False)
+    paper_count = db.query(PaperTrade).filter(PaperTrade.owner_id == santi_user.id).delete(synchronize_session=False)
+    live_count = db.query(LiveTrade).filter(LiveTrade.user_id == santi_user.id).delete(synchronize_session=False)
     
     db.commit()
-    return {"success": f"Cleaned up data for {santi_user.username} (ID: {santi_user.id})"}
+    logger.info(f"Cleanup: Deleted {paper_count} paper trades and {live_count} live trades.")
+    return {
+        "success": f"Cleaned up data for {santi_user.username} (ID: {santi_user.id})",
+        "deleted": {
+            "strategies": len(strategy_ids),
+            "paper_trades": paper_count,
+            "live_trades": live_count
+        }
+    }
