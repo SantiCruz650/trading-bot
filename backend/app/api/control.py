@@ -230,35 +230,51 @@ async def test_binance_connectivity():
 
 @router.get("/debug/emergency-cleanup")
 async def emergency_cleanup(db: Session = Depends(get_db)):
-    """One-off cleanup to delete 'santi' data and reduce Supabase DB size."""
-    from app.models.models import User, Strategy, StrategyExecution, PaperTrade, LiveTrade
+    """One-off deep cleanup to delete 'santi' data and account to resolve Supabase egress issues."""
+    from app.models.models import User, Strategy, StrategyExecution, PaperTrade, LiveTrade, Prediction, Alert
+    from sqlalchemy import func
     
-    target_usernames = ["santi", "santiagomiguelcruz"]
-    santi_user = db.query(User).filter(User.username.in_(target_usernames)).first()
+    target_usernames = ["santi", "santiagomiguelcruz", "Santi"]
+    santi_user = db.query(User).filter(func.lower(User.username).in_([u.lower() for u in target_usernames])).first()
     
     if not santi_user:
-        logger.warning(f"Cleanup: User 'santi' or 'santiagomiguelcruz' not found.")
-        return {"error": "User 'santi' or 'santiagomiguelcruz' not found."}
+        logger.warning(f"Cleanup: User with names {target_usernames} not found.")
+        return {"error": f"User {target_usernames} not found. Check spelling (Case insensitive)."}
 
-    # 1. Delete Executions
+    # 1. Delete Predictions & Alerts
+    pred_count = db.query(Prediction).filter(Prediction.owner_id == santi_user.id).delete(synchronize_session=False)
+    alert_count = db.query(Alert).filter(Alert.owner_id == santi_user.id).delete(synchronize_session=False)
+
+    # 2. Delete Strategies & Executions
     strategies = db.query(Strategy).filter(Strategy.user_id == santi_user.id).all()
     strategy_ids = [s.id for s in strategies]
+    exec_count = 0
+    strat_count = 0
     
     if strategy_ids:
         exec_count = db.query(StrategyExecution).filter(StrategyExecution.strategy_id.in_(strategy_ids)).delete(synchronize_session=False)
         strat_count = db.query(Strategy).filter(Strategy.id.in_(strategy_ids)).delete(synchronize_session=False)
-        logger.info(f"Cleanup: Deleted {exec_count} execs and {strat_count} strats for {santi_user.username}")
     
+    # 3. Delete Trades
     paper_count = db.query(PaperTrade).filter(PaperTrade.owner_id == santi_user.id).delete(synchronize_session=False)
     live_count = db.query(LiveTrade).filter(LiveTrade.user_id == santi_user.id).delete(synchronize_session=False)
     
+    # 4. Delete the User Account itself
+    uname = santi_user.username
+    db.delete(santi_user)
+    
     db.commit()
-    logger.info(f"Cleanup: Deleted {paper_count} paper trades and {live_count} live trades.")
+    logger.info(f"🔥 DEEP CLEANUP: User {uname} and all related data deleted from Supabase.")
+    
     return {
-        "success": f"Cleaned up data for {santi_user.username} (ID: {santi_user.id})",
+        "success": f"Cleaned up ALL data and deleted account for {uname}",
         "deleted": {
-            "strategies": len(strategy_ids),
+            "predictions": pred_count,
+            "alerts": alert_count,
+            "strategies": strat_count,
+            "executions": exec_count,
             "paper_trades": paper_count,
-            "live_trades": live_count
+            "live_trades": live_count,
+            "user_account": uname
         }
     }
