@@ -7,6 +7,7 @@ from pathlib import Path
 import httpx
 import logging
 
+from app.services.state_store import state_store
 logger = logging.getLogger(__name__)
 
 class StrategyEngine:
@@ -131,18 +132,19 @@ class StrategyEngine:
         self._evaluate_ml_performance(strategy, current_price, db)
         
         # 3. Drawdown Guard & Market Regime Data
-        price_history = params.get("price_history", [])
+        # ETAPA 7: Use Memory Store instead of DB Params for high-frequency history
+        strategy_state = state_store.get_state(strategy.id)
+        price_history = strategy_state["price_history"]
+        
         now = datetime.utcnow()
-        # Keep last 200 points for EMA calculation (~50 mins at 15s)
+        # Keep last 200 points (~100 mins at 30s)
         price_history = price_history[-199:]
         price_history.append({'ts': now.isoformat(), 'price': current_price})
-        params['price_history'] = price_history
+        strategy_state["price_history"] = price_history
         
         paused_until = params.get("paused_until")
         if paused_until and now < datetime.fromisoformat(paused_until):
-            strategy.params = params
-            flag_modified(strategy, "params")
-            db.commit()
+            # No commit needed if just checking pause
             return None
 
         # 3.1 Market Regime Detection
@@ -157,15 +159,15 @@ class StrategyEngine:
             ten_mins_ago = now - timedelta(minutes=10)
             recent_prices = [p for p in price_history if datetime.fromisoformat(p['ts']) > ten_mins_ago]
             if recent_prices:
-                oldest_price = recent_prices[0]['price']
-                drop_pct = (current_price - oldest_price) / oldest_price
-                if drop_pct <= -0.04:
-                    params['paused_until'] = (now + timedelta(minutes=30)).isoformat()
-                    print(f"🚨 Drawdown detected ({drop_pct*100:.1f}%). Buying paused for 30m.")
-                    strategy.params = params
-                    flag_modified(strategy, "params")
-                    db.commit()
-                    return None
+                if oldest_price > 0:
+                    drop_pct = (current_price - oldest_price) / oldest_price
+                    if drop_pct <= -0.04:
+                        params['paused_until'] = (now + timedelta(minutes=30)).isoformat()
+                        print(f"🚨 Drawdown detected ({drop_pct*100:.1f}%). Buying paused for 30m.")
+                        strategy.params = params
+                        flag_modified(strategy, "params")
+                        db.commit() # Commit only on state change (Pause)
+                        return None
 
         # 4. Check Sell Condition (Trailing Take Profit)
         if total_eth > 0 and avg_price > 0:
@@ -508,27 +510,20 @@ class StrategyEngine:
             with open(log_path, "a") as f:
                 f.write(f"{datetime.utcnow().isoformat()} | {ticker} | {ml_signal} | {current_price:.2f}\n")
                 
-            # Store for evaluation
-            params = strategy.params or {}
-            pending = params.get("pending_ml_evaluations", [])
-            pending.append({
+            # ETAPA 7: Store in Memory Store
+            state_store.add_ml_evaluation(strategy.id, {
                 "signal": ml_signal,
                 "entry_price": current_price,
                 "timestamp": datetime.utcnow().isoformat()
             })
-            params["pending_ml_evaluations"] = pending
-            strategy.params = params
-            flag_modified(strategy, "params")
-            db.commit()
         except Exception as e:
             logger.warning(f"Failed to log ML insight: {str(e)}")
             pass
         return data
-
     def _evaluate_ml_performance(self, strategy, current_price, db):
-        """Evaluate pending ML signals after 1 hour."""
-        params = strategy.params or {}
-        pending = params.get("pending_ml_evaluations", [])
+        """Evaluate pending ML signals after 1 hour using Memory Store."""
+        strategy_state = state_store.get_state(strategy.id)
+        pending = strategy_state.get("pending_ml_evaluations", [])
         if not pending:
             return
             
@@ -536,7 +531,9 @@ class StrategyEngine:
         eval_log_path = Path(__file__).resolve().parent.parent.parent / "ml_evaluation.log"
         
         new_pending = []
-        metrics = params.get("ml_metrics", {"tp": 0, "fp": 0, "tn": 0, "fn": 0, "total": 0})
+        # Metrics are kept in memory for now to save DB egress
+        # We can move these to a permanent table if needed
+        metrics = {"tp": 0, "fp": 0, "total": 0} 
         
         for p in pending:
             ts = datetime.fromisoformat(p["timestamp"])
@@ -555,36 +552,20 @@ class StrategyEngine:
                         result = "FAILURE"
                 elif signal == "SELL":
                     if current_price < entry_price:
-                        metrics["tp"] += 1 # We count correct SELL as TP for simplicity in this context
+                        metrics["tp"] += 1
                         result = "SUCCESS"
                     else:
                         metrics["fp"] += 1
                         result = "FAILURE"
                 
-                # Log individual evaluation
                 with open(eval_log_path, "a") as f:
                     f.write(f"{now.isoformat()} | {strategy.ticker} | Signal: {signal} | Entry: {entry_price:.2f} | Exit: {current_price:.2f} | Result: {result}\n")
             else:
                 new_pending.append(p)
         
         if len(new_pending) != len(pending):
-            # Calculate cumulative metrics
-            tp = metrics["tp"]
-            fp = metrics["fp"]
-            total = metrics["total"]
-            
-            accuracy = tp / total if total > 0 else 0
-            precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-            
-            # Log summary
-            with open(eval_log_path, "a") as f:
-                f.write(f"📊 ML SUMMARY | Ticker: {strategy.ticker} | Accuracy: {accuracy:.2f} | Precision: {precision:.2f} | Total Evaluated: {total}\n")
-            
-            params["pending_ml_evaluations"] = new_pending
-            params["ml_metrics"] = metrics
-            strategy.params = params
-            flag_modified(strategy, "params")
-            db.commit()
+            state_store.set_ml_evaluations(strategy.id, new_pending)
+            logger.info(f"📊 ML Evaluated for {strategy.ticker}. {len(pending) - len(new_pending)} signals processed.")
 
     def _evaluate_grid(self, strategy, current_price, db):
         """

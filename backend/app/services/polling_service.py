@@ -86,13 +86,17 @@ class PollingService:
         logger.info(f"🤖 Bot running in {self.active_mode} MODE")
         logger.info(f"🚀 Interval: {self.interval}s | Tickers: {', '.join(self.tickers)}")
         
+        cycle_count = 0
         while self.running:
             try:
-                # ETAPA 4.2 - Multi-worker State Sync
-                # Reload state from DB to catch changes from other workers (e.g., Unlock)
-                self.load_state()
-                from app.services.risk_manager import RiskManager
-                RiskManager().load_state()
+                # ETAPA 7: Only reload global state from DB every 4 cycles (~2 mins at 30s)
+                # to reduce Supabase egress unless important change detected.
+                if cycle_count % 4 == 0:
+                    self.load_state()
+                    from app.services.risk_manager import RiskManager
+                    RiskManager().load_state()
+                
+                cycle_count += 1
                 
                 if self.killed:
                     logger.warning("🚨 Polling loop active but system is KILLED. Skipping cycle.")
@@ -106,21 +110,12 @@ class PollingService:
                     if not self.running:
                         break
                         
-                    # In local simulation, ExchangeService.exchange is None,
-                    # but we can call get_ticker_price which uses market_simulator.
                     price = exchange.get_ticker_price(symbol)
                     if price:
-                        ticker_name = symbol.split('/')[0]
-                        balance = exchange.get_balance()
-                        
-                        # Get accumulated asset amount for this ticker
-                        # We'll use a helper to get this from the database
-                        accumulated = self._get_accumulated(symbol)
-                        
-                        # Log the cycle
-                        logger.info(f"🕒 [{datetime.now().strftime('%H:%M:%S')}] {symbol}: ${price:,.2f} | Balance: ${balance:,.2f}")
-                        if settings.MOCK_EXCHANGE:
-                            logger.info(f"🧪 [MOCK TICK] {symbol} @ {price:,.2f}")
+                        # Log only every 2 cycles per ticker to reduce log spam/egress
+                        if cycle_count % 2 == 0:
+                            balance = exchange.get_balance()
+                            logger.info(f"🕒 [{datetime.now().strftime('%H:%M:%S')}] {symbol}: ${price:,.2f} | Bal: ${balance:,.2f}")
                         
                         # Trigger Strategy Engine
                         await asyncio.to_thread(self._run_strategy_engine, symbol, price)
@@ -130,7 +125,7 @@ class PollingService:
                 
             except Exception as e:
                 logger.error(f"❌ Polling cycle error: {e}")
-                await asyncio.sleep(10)  # Silent retry delay
+                await asyncio.sleep(10)
 
     async def stop(self):
         self.running = False
@@ -177,4 +172,4 @@ class PollingService:
         finally:
             db.close()
 
-polling_service = PollingService(interval_seconds=15)
+polling_service = PollingService(interval_seconds=30)
