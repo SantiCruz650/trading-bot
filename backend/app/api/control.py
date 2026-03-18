@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 import logging
 import asyncio
 from datetime import datetime
@@ -9,7 +10,7 @@ from ..core.config import settings
 from pydantic import BaseModel
 from ..services.polling_service import polling_service
 from ..services.risk_manager import RiskManager
-from ..db.session import SessionLocal
+from ..db.session import SessionLocal, get_db
 from ..models.models import Strategy
 
 router = APIRouter()
