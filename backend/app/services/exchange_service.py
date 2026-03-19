@@ -172,7 +172,8 @@ class ExchangeService:
         symbol: str, 
         side: str, 
         amount: float,
-        stop_loss_pct: Optional[float] = None
+        stop_loss_pct: Optional[float] = None,
+        user_mode: str = "MOCK"
     ) -> Optional[Dict]:
         """Place a market order"""
         try:
@@ -193,8 +194,11 @@ class ExchangeService:
                 
             cost = amount * price
             
+            # Force simulation if user mode is MOCK
+            is_simulation = self.local_simulation or user_mode == "MOCK"
+            
             # --- SECURITY AUDIT: Balance Validation (Real API) ---
-            if not self.local_simulation:
+            if not is_simulation:
                 try:
                     current_free_usdt = self.get_balance('USDT')
                     # Estimate cost with 0.1% buffer for fees
@@ -206,7 +210,7 @@ class ExchangeService:
                     if "Fondos insuficientes" in str(e): raise e
                     logger.warning(f"Could not verify balance before trade: {e}")
             
-            if self.local_simulation:
+            if is_simulation:
                 # Update virtual balance with fees (0.1% = 0.001)
                 fee = cost * 0.001
                 if side == 'buy':
@@ -230,8 +234,8 @@ class ExchangeService:
                     'status': 'filled'
                 }
             
-            # DRY_RUN_REAL_API Safety Block
-            if self.dry_run_real or not settings.ENABLE_REAL_TRADING:
+            # DRY_RUN Safety Block
+            if user_mode == "DRY_RUN":
                 latency = 0
                 try:
                     import time
@@ -246,7 +250,7 @@ class ExchangeService:
                 order_id = f"dry_run_{int(datetime.now().timestamp())}"
                 intent_label = f"INTENT_{side.upper()}"
                 
-                logger.warning(f"🛡️ {intent_label} | {amount} {symbol} @ ${price:,.2f} | Fee (Est): ${fee:.4f} | Latency: {latency:.2f}ms")
+                logger.warning(f"🛡️ DRY_RUN | {amount} {symbol} @ ${price:,.2f} | Fee (Est): ${fee:.4f} | Latency: {latency:.2f}ms")
                 print(f"🛡️ DRY_RUN: {intent_label} {amount} {symbol} intercepted. Latency: {latency:.2f}ms")
                 
                 return {
@@ -260,8 +264,8 @@ class ExchangeService:
                     'info': {'dry_run': True, 'latency_ms': latency, 'intent': intent_label}
                 }
 
-            # Real order via ccxt (ONLY IF ENABLE_REAL_TRADING IS TRUE)
-            if settings.ENABLE_REAL_TRADING:
+            # Real order via ccxt (ONLY IF user_mode == LIVE)
+            if user_mode == "LIVE":
                 logger.info(f"🚀 EXECUTING REAL {side.upper()} market order: {amount} {symbol}")
                 order = self.exchange.create_market_order(
                     symbol=symbol,

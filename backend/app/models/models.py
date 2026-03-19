@@ -9,6 +9,9 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     first_login = Column(Boolean, default=True)
+    bot_active = Column(Boolean, default=False)
+    bot_mode = Column(String, default="MOCK")
+
     predictions = relationship("Prediction", back_populates="owner")
     paper_trades = relationship("PaperTrade", back_populates="owner")
     alerts = relationship("Alert", back_populates="owner")

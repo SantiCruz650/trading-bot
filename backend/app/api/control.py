@@ -32,8 +32,8 @@ async def update_risk_profile(data: RiskProfileUpdate):
 logger = logging.getLogger(__name__)
 
 @router.post("/start")
-async def start_bot(data: dict = None):
-    """Starts the background polling service with specific mode validation (MOCK, DRY_RUN, LIVE)."""
+async def start_bot(data: dict = None, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Starts the bot for the current user and ensures the background polling service is running."""
     if polling_service.killed:
          raise HTTPException(
                 status_code=403, 
@@ -69,33 +69,31 @@ async def start_bot(data: dict = None):
                 status_code=400, 
                 detail=f"El modo {mode} requiere API keys válidas configuradas."
             )
-        
-        if mode == "LIVE" and not settings.ENABLE_REAL_TRADING:
-             raise HTTPException(
-                status_code=400, 
-                detail="El modo LIVE requiere ENABLE_REAL_TRADING=True en el archivo .env."
-            )
+
+    # Activate user bot
+    current_user.bot_active = True
+    current_user.bot_mode = mode
+    db.commit()
 
     if not polling_service.running:
-        asyncio.create_task(polling_service.start(mode=mode))
-        return {"message": f"Bot iniciado correctamente en modo {mode}."}
-    return {"message": f"El bot ya está en ejecución ({polling_service.active_mode})."}
+        asyncio.create_task(polling_service.start(mode="MULTI_TENANT"))
+        return {"message": f"Bot iniciado correctamente para {current_user.username} en modo {mode}."}
+    return {"message": f"Bot actualizado para {current_user.username} en modo {mode}."}
 
 @router.post("/stop")
-async def stop_bot(data: dict = None):
-    """Stops the background polling service."""
-    if polling_service.running:
-        await polling_service.stop()
-        return {"message": "Bot detenido. Las posiciones permanecen abiertas."}
-    return {"message": "El bot ya estaba detenido."}
+async def stop_bot(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Stops the bot for the current user."""
+    current_user.bot_active = False
+    db.commit()
+    return {"message": f"Bot detenido para {current_user.username}. Las posiciones permanecen abiertas."}
 
 @router.get("/status")
-async def get_bot_status():
-    """Returns the current operational status of the bot (Canonical Etapa 4.2)."""
+async def get_bot_status(current_user: User = Depends(get_current_user)):
+    """Returns the current operational status of the bot for the user."""
     risk_mgr = RiskManager()
     
     status = "STOPPED"
-    if polling_service.running:
+    if current_user.bot_active:
         status = "RUNNING"
     
     if polling_service.killed:
@@ -107,7 +105,7 @@ async def get_bot_status():
         
     return {
         "status": status,
-        "mode": polling_service.active_mode or ("MOCK" if settings.MOCK_EXCHANGE else "STOPPED"),
+        "mode": current_user.bot_mode,
         "uptime": int(uptime),
         "last_action": polling_service.last_action,
         "risk_state": risk_mgr.gec_state,

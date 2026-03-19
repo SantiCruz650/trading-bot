@@ -46,9 +46,11 @@ class StrategyEngine:
     def evaluate_strategies(self, ticker: str, current_price: float, db: Session):
         """Check all active strategies for this ticker and execute if needed."""
         # Heartbeat: Explicitly log ticker activity to verify the loop is running on Render
-        strategies = db.query(Strategy).filter(
+        from app.models.models import User
+        strategies = db.query(Strategy).join(User).filter(
             Strategy.ticker == ticker, 
-            Strategy.status == "ACTIVE"
+            Strategy.status == "ACTIVE",
+            User.bot_active == True
         ).all()
         
         logger.info(f"🔍 [{ticker}] Heartbeat: Price ${current_price:,.2f} | Active Strategies: {len(strategies)}")
@@ -585,12 +587,15 @@ class StrategyEngine:
         # 1. Place order via ExchangeService (updates virtual balance)
         balance_before = exchange.get_balance()
         
+        user_mode = strategy.user.bot_mode if hasattr(strategy.user, 'bot_mode') else "MOCK"
+        
         try:
             # For SELL, amount is USDT value to sell
             order = exchange.place_market_order(
                 symbol=strategy.ticker, # Now already in "BTC/USDT" format
                 side=order_type.lower(),
-                amount=amount / price
+                amount=amount / price,
+                user_mode=user_mode
             )
             
             if not order:
@@ -634,7 +639,7 @@ class StrategyEngine:
         from app.models.models import LiveTrade
         
         # If real trading is active and Not a local simulation, record as LiveTrade
-        if settings.ENABLE_REAL_TRADING and not settings.OBSERVATION_ONLY:
+        if user_mode == "LIVE":
              logger.info(f"🔥 {user_tag} RECORDING LIVE TRADE")
              live_trade = LiveTrade(
                 user_id=strategy.user_id,
@@ -664,7 +669,7 @@ class StrategyEngine:
             
         db.commit()
         
-        return f"Executed {order_type} for {strategy.ticker} at ${price:,.2f} [{'REAL' if settings.ENABLE_REAL_TRADING else 'SIM'}]"
+        return f"Executed {order_type} for {strategy.ticker} at ${price:,.2f} [{user_mode}]"
 
     def _get_global_portfolio_stats(self, db): # Added db for future use
         """Mock global portfolio stats for Risk Governor."""
