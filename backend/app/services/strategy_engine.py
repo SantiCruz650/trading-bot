@@ -90,7 +90,11 @@ class StrategyEngine:
         amount_to_buy = params.get("amount", settings.BASE_TRADE_AMOUNT)
         # 1. Get current position stats
         avg_price, total_eth, dca_levels = self._get_position_stats(strategy, db)
-        current_balance = exchange.get_balance()
+        
+        user_mode = strategy.user.bot_mode if hasattr(strategy.user, 'bot_mode') else "MOCK"
+        username = strategy.user.username if hasattr(strategy.user, 'username') else "UNKNOWN"
+        
+        current_balance = exchange.get_balance(user_mode=user_mode, username=username)
         
         # 1.1 Calculate Dynamic Position Size
         amount_to_buy, params = self._calculate_dynamic_size(strategy, current_price, current_balance, total_eth)
@@ -585,10 +589,11 @@ class StrategyEngine:
         from app.services.exchange_service import get_exchange
         exchange = get_exchange(local_simulation=settings.OBSERVATION_ONLY)
         
-        # 1. Place order via ExchangeService (updates virtual balance)
-        balance_before = exchange.get_balance()
-        
         user_mode = strategy.user.bot_mode if hasattr(strategy.user, 'bot_mode') else "MOCK"
+        username = strategy.user.username if hasattr(strategy.user, 'username') else "UNKNOWN"
+        
+        # 1. Place order via ExchangeService (updates virtual balance)
+        balance_before = exchange.get_balance(user_mode=user_mode, username=username)
         
         try:
             # For SELL, amount is USDT value to sell
@@ -596,7 +601,8 @@ class StrategyEngine:
                 symbol=strategy.ticker, # Now already in "BTC/USDT" format
                 side=order_type.lower(),
                 amount=amount / price,
-                user_mode=user_mode
+                user_mode=user_mode,
+                username=username
             )
             
             if not order:

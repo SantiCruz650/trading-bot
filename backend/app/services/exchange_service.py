@@ -141,10 +141,18 @@ class ExchangeService:
             return round(price, 2)
         return float(self.exchange.price_to_precision(symbol, price))
 
-    def get_balance(self, currency: str = 'USDT') -> float:
+    def get_balance(self, currency: str = 'USDT', user_mode: str = "LIVE", username: str = "prodbymontu") -> float:
         """Get account balance"""
-        if self.local_simulation:
-            return self.virtual_balance
+        # Force simulation if user mode is MOCK
+        is_simulation = self.local_simulation or user_mode == "MOCK"
+        
+        if is_simulation:
+            if username == "test":
+                if not hasattr(self, 'test_virtual_balance'):
+                    self.test_virtual_balance = 13000.0
+                return self.test_virtual_balance
+            else:
+                return self.virtual_balance
             
         try:
             balance = self.exchange.fetch_balance()
@@ -173,7 +181,8 @@ class ExchangeService:
         side: str, 
         amount: float,
         stop_loss_pct: Optional[float] = None,
-        user_mode: str = "MOCK"
+        user_mode: str = "MOCK",
+        username: str = "test"
     ) -> Optional[Dict]:
         """Place a market order"""
         try:
@@ -214,15 +223,28 @@ class ExchangeService:
                 # Update virtual balance with fees (0.1% = 0.001)
                 fee = cost * 0.001
                 if side == 'buy':
-                    if cost + fee > self.virtual_balance:
-                        logger.error(f"Insufficient virtual balance (including fees): {self.virtual_balance} < {cost + fee}")
-                        return None
-                    self.virtual_balance -= (cost + fee)
+                    if username == "test":
+                        if cost + fee > getattr(self, 'test_virtual_balance', 13000.0):
+                            logger.error(f"Insufficient test virtual balance: {getattr(self, 'test_virtual_balance', 13000.0)} < {cost + fee}")
+                            return None
+                        self.test_virtual_balance -= (cost + fee)
+                        current_virtual = self.test_virtual_balance
+                    else:
+                        if cost + fee > self.virtual_balance:
+                            logger.error(f"Insufficient virtual balance (including fees): {self.virtual_balance} < {cost + fee}")
+                            return None
+                        self.virtual_balance -= (cost + fee)
+                        current_virtual = self.virtual_balance
                 else:
-                    self.virtual_balance += (cost - fee)
+                    if username == "test":
+                        self.test_virtual_balance += (cost - fee)
+                        current_virtual = self.test_virtual_balance
+                    else:
+                        self.virtual_balance += (cost - fee)
+                        current_virtual = self.virtual_balance
                 
                 order_id = f"sim_{int(datetime.now().timestamp())}"
-                logger.info(f"✅ [SIM] {side.upper()} {amount} {symbol} @ ${price:,.2f} | Fee: ${fee:.4f} | Balance: ${self.virtual_balance:,.2f}")
+                logger.info(f"✅ [SIM {username}] {side.upper()} {amount} {symbol} @ ${price:,.2f} | Fee: ${fee:.4f} | Balance: ${current_virtual:,.2f}")
                 
                 return {
                     'id': order_id,
