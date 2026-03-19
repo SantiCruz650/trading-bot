@@ -188,7 +188,7 @@ class RiskManager:
         
         # Initialize peak equity on first update if it's still at default 
         if self._daily_peak_equity == 10000.0 or self._daily_peak_equity == 1000.0:
-            if self._current_equity > 0:
+            if self._current_equity >= 0:
                  logger.info(f"📈 Initializing peak equity to {self._current_equity}")
                  self._daily_peak_equity = self._current_equity
                  self._daily_start_equity = self._current_equity
