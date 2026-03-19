@@ -161,6 +161,7 @@ class StrategyEngine:
             ten_mins_ago = now - timedelta(minutes=10)
             recent_prices = [p for p in price_history if datetime.fromisoformat(p['ts']) > ten_mins_ago]
             if recent_prices:
+                oldest_price = recent_prices[0]['price']
                 if oldest_price > 0:
                     drop_pct = (current_price - oldest_price) / oldest_price
                     if drop_pct <= -0.04:
