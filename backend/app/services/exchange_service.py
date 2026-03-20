@@ -143,8 +143,8 @@ class ExchangeService:
 
     def get_balance(self, currency: str = 'USDT', user_mode: str = "LIVE", username: str = "prodbymontu") -> float:
         """Get account balance"""
-        # Force simulation if user mode is MOCK
-        is_simulation = self.local_simulation or user_mode == "MOCK"
+        # Force simulation if user mode is MOCK, or if user is 'test'
+        is_simulation = self.local_simulation or user_mode == "MOCK" or username == "test"
         
         if is_simulation:
             if username == "test":
@@ -203,8 +203,8 @@ class ExchangeService:
                 
             cost = amount * price
             
-            # Force simulation if user mode is MOCK
-            is_simulation = self.local_simulation or user_mode == "MOCK"
+            # Force simulation if user mode is MOCK, or if user is 'test'
+            is_simulation = self.local_simulation or user_mode == "MOCK" or username == "test"
             
             # --- SECURITY AUDIT: Balance Validation (Real API) ---
             if not is_simulation:
