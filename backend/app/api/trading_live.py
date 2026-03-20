@@ -129,7 +129,9 @@ async def get_balance(current_user: UserModel = Depends(get_current_user)):
     """Get current account balance"""
     try:
         exchange = get_exchange(testnet=True)
-        balance = exchange.get_balance('USDT')
+        user_mode = current_user.bot_mode if hasattr(current_user, 'bot_mode') else "MOCK"
+        username = current_user.username if hasattr(current_user, 'username') else "UNKNOWN"
+        balance = exchange.get_balance('USDT', user_mode=user_mode, username=username)
         
         return {
             "currency": "USDT",

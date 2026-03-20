@@ -188,7 +188,9 @@ async def get_trading_balance(db: Session = Depends(get_db), current_user: User 
     exchange = get_exchange(local_simulation=settings.OBSERVATION_ONLY)
     risk_mgr = RiskManager()
     
-    balance = exchange.get_balance()
+    user_mode = current_user.bot_mode if hasattr(current_user, 'bot_mode') else "MOCK"
+    username = current_user.username if hasattr(current_user, 'username') else "UNKNOWN"
+    balance = exchange.get_balance(user_mode=user_mode, username=username)
     stats = risk_mgr.get_daily_stats()
     
     # Mock some data for dashboard consistency if needed
