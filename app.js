@@ -121,13 +121,42 @@ function initDashboard() {
   fetchStatus();
   fetchBalance();
   fetchPortfolio();
+  fetchTickers();
   initTradingViewChart();
   // Auto-refresh every 30s
   setInterval(() => {
     fetchStatus();
     fetchBalance();
     fetchPortfolio();
+    fetchTickers();
   }, 30000);
+}
+
+/* ========= Fetch Tickers (Live Prices) ========= */
+async function fetchTickers() {
+  const symbols = ['ETHUSDT', 'BTCUSDT', 'SOLUSDT', 'ADAUSDT', 'DOGEUSDT'];
+  try {
+    // Try to fetch from Binance directly for the UI tickers
+    const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    data.forEach(t => {
+      const btn = $(`.symbol[data-sym="${t.symbol}"]`);
+      if (!btn) return;
+      const px = btn.querySelector('.symbol__px');
+      const chg = btn.querySelector('.symbol__chg');
+      
+      const price = parseFloat(t.lastPrice);
+      const change = parseFloat(t.priceChangePercent);
+      
+      px.textContent = price < 1 ? price.toFixed(4) : price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      chg.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+      chg.className = `symbol__chg num ${change >= 0 ? 't-green' : 't-red'}`;
+    });
+  } catch (e) {
+    console.warn('Ticker fetch failed:', e);
+  }
 }
 
 /* ========= Fetch Status ========= */
@@ -418,14 +447,18 @@ document.addEventListener('keydown', (e) => {
   const clear = $('.card--log .link');
   if (clear) clear.addEventListener('click', () => { log.innerHTML = ''; });
   const evts = [
-    ['INFO', 'Feature snapshot tick'],
-    ['OK', 'Heartbeat ML-DCA'],
-    ['OK', 'GEC tick · state NORMAL'],
-    ['INFO', 'Order book refresh'],
-    ['WARN', 'Slippage drift 0.08%'],
+    ['INFO', 'Strategy scan: ML models confirming trend'],
+    ['OK', 'Heartbeat ML-DCA · Cycle active'],
+    ['OK', 'GEC check: Global Exposure is safe'],
+    ['INFO', 'Liquidity check: Spread is optimal'],
+    ['WARN', 'Volatility spike detected · Caution mode'],
+    ['INFO', 'Polling exchange for price updates'],
   ];
   let n = 8421;
   setInterval(() => {
+    // Only add logs if the app is visible
+    if (!$('#appContent').classList.contains('visible')) return;
+
     const e = evts[Math.floor(Math.random() * evts.length)];
     const d = new Date();
     const t = `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}:${String(d.getUTCSeconds()).padStart(2, '0')}`;
@@ -433,8 +466,8 @@ document.addEventListener('keydown', (e) => {
     const cls = e[0] === 'OK' ? 'tag--ok' : e[0] === 'WARN' ? 'tag--warn' : 'tag--info';
     li.innerHTML = `<span class="log__t num">${t}</span><span class="tag ${cls}">${e[0]}</span><span>${e[1]} · cycle #${++n}</span>`;
     log.insertBefore(li, log.firstChild);
-    while (log.children.length > 20) log.removeChild(log.lastChild);
-  }, 5000);
+    while (log.children.length > 15) log.removeChild(log.lastChild);
+  }, 8000);
 })();
 
 /* ========= Segmented Controls ========= */
