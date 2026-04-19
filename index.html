@@ -1,0 +1,1371 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MCrypto — Trading Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   MCRYPTO — styles
+   Slate + muted gold, balanced density
+============================================ */
+
+:root {
+  --bg: oklch(0.16 0.008 250);
+  --bg-2: oklch(0.19 0.008 250);
+  --card: oklch(0.22 0.008 250);
+  --card-2: oklch(0.25 0.008 250);
+  --border: oklch(0.32 0.01 250);
+  --border-soft: oklch(0.28 0.008 250);
+  --fg: oklch(0.96 0.005 250);
+  --fg-mid: oklch(0.74 0.01 250);
+  --fg-dim: oklch(0.56 0.012 250);
+  --muted: oklch(0.48 0.012 250);
+
+  --gold: oklch(0.80 0.12 85);
+  --gold-soft: oklch(0.80 0.12 85 / .15);
+  --green: oklch(0.74 0.15 150);
+  --red: oklch(0.68 0.20 25);
+  --orange: oklch(0.76 0.16 55);
+  --info: oklch(0.72 0.10 230);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --gap: 20px;
+  --row-h: 40px;
+
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "Inter", system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+[data-theme="light"] {
+  --bg: oklch(0.98 0.004 90);
+  --bg-2: oklch(0.96 0.004 90);
+  --card: oklch(1 0 0);
+  --card-2: oklch(0.97 0.004 90);
+  --border: oklch(0.88 0.005 250);
+  --border-soft: oklch(0.92 0.005 250);
+  --fg: oklch(0.22 0.015 250);
+  --fg-mid: oklch(0.38 0.012 250);
+  --fg-dim: oklch(0.52 0.012 250);
+  --muted: oklch(0.56 0.012 250);
+
+  --gold: oklch(0.62 0.12 75);
+  --gold-soft: oklch(0.62 0.12 75 / .12);
+  --green: oklch(0.58 0.15 150);
+  --red: oklch(0.56 0.20 25);
+  --orange: oklch(0.64 0.16 55);
+  --info: oklch(0.55 0.12 230);
+}
+
+[data-accent="teal"]  { --gold: oklch(0.72 0.12 185); --gold-soft: oklch(0.72 0.12 185 / .15); }
+[data-accent="violet"]{ --gold: oklch(0.70 0.14 295); --gold-soft: oklch(0.70 0.14 295 / .15); }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.muted { color: var(--muted); }
+.t-green { color: var(--green); }
+.t-red   { color: var(--red); }
+.t-gold  { color: var(--gold); }
+.t-mid   { color: var(--fg-mid); }
+
+/* -------- NAV -------- */
+.nav {
+  height: 64px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(var(--bg-2), var(--bg));
+  position: sticky; top: 0; z-index: 40;
+}
+.nav__left  { display: flex; align-items: center; gap: 28px; min-width: 0; }
+.nav__center{ display: flex; justify-content: center; }
+.nav__right { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--fg); text-decoration: none;
+  font-weight: 700; letter-spacing: 0.14em; font-size: 13px;
+}
+.brand__mark {
+  width: 32px; height: 32px; display: grid; place-items: center;
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--gold); background: var(--card);
+}
+.brand__word { font-family: var(--sans); }
+
+.nav__tabs { display: flex; gap: 2px; }
+.tab {
+  background: none; border: 0; color: var(--fg-mid);
+  padding: 8px 12px; border-radius: 6px; cursor: pointer;
+  font: inherit; font-weight: 500;
+  position: relative;
+}
+.tab:hover { color: var(--fg); background: var(--card); }
+.tab.is-active { color: var(--fg); }
+.tab.is-active::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: -22px;
+  height: 2px; background: var(--gold); border-radius: 2px;
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 14px; border: 1px solid var(--border);
+  background: var(--card); border-radius: 999px;
+  font-size: 12.5px; color: var(--fg-mid);
+}
+.status-pill strong { color: var(--fg); font-weight: 600; letter-spacing: 0.02em; }
+.status-pill .divider { width: 1px; height: 14px; background: var(--border); }
+
+.toggle-group {
+  display: inline-flex; padding: 3px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--card);
+}
+.toggle {
+  background: none; border: 0; color: var(--fg-mid);
+  padding: 4px 9px; border-radius: 5px; cursor: pointer;
+  font: 600 11px var(--sans); letter-spacing: 0.08em;
+}
+.toggle.is-active { background: var(--card-2); color: var(--fg); }
+
+.icon-btn {
+  position: relative;
+  width: 36px; height: 36px; display: grid; place-items: center;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--card); color: var(--fg-mid); cursor: pointer;
+}
+.icon-btn:hover { color: var(--fg); background: var(--card-2); }
+.icon-btn--sm { width: 28px; height: 28px; border-radius: 6px; }
+.icon-btn__dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold); box-shadow: 0 0 0 2px var(--card);
+}
+[data-theme="dark"] .i-sun, [data-theme="light"] .i-moon { display: none; }
+
+/* profile */
+.profile { position: relative; }
+.profile__btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 10px 4px 4px; height: 40px;
+  border: 1px solid var(--border); border-radius: 999px;
+  background: var(--card); color: var(--fg); cursor: pointer;
+  font: inherit;
+}
+.profile__btn:hover { background: var(--card-2); }
+.profile__meta { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; }
+.profile__name { font-size: 13px; font-weight: 600; }
+.profile__role { font-size: 11px; color: var(--muted); }
+
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  position: relative; flex: 0 0 32px;
+  background: var(--card-2);
+}
+.avatar__img {
+  position: absolute; inset: 2px; border-radius: 50%;
+  background-size: cover; background-position: center;
+}
+.avatar__ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid var(--gold);
+}
+.avatar--lg { width: 48px; height: 48px; flex: 0 0 48px; }
+
+.menu {
+  position: absolute; right: 0; top: calc(100% + 10px);
+  width: 260px; padding: 8px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px -8px rgba(0,0,0,.45);
+  opacity: 0; transform: translateY(-6px); pointer-events: none;
+  transition: 0.18s ease;
+  z-index: 50;
+}
+.profile.is-open .menu { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.menu__header {
+  display: flex; gap: 12px; padding: 12px 10px 14px;
+  border-bottom: 1px solid var(--border); margin-bottom: 6px;
+}
+.menu__name { font-weight: 600; font-size: 14px; }
+.menu__mail { font-size: 12px; color: var(--muted); }
+.menu__tag {
+  display: inline-block; margin-top: 6px;
+  font: 600 10px/1 var(--mono); letter-spacing: 0.1em;
+  color: var(--gold); padding: 3px 6px; border-radius: 4px;
+  background: var(--gold-soft);
+}
+.menu__item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 9px 10px; border: 0; background: none;
+  color: var(--fg-mid); font: inherit; cursor: pointer;
+  border-radius: 8px; text-align: left;
+}
+.menu__item:hover { background: var(--card-2); color: var(--fg); }
+.menu__item--danger { color: var(--red); }
+.menu__item--danger:hover { background: color-mix(in oklab, var(--red) 15%, transparent); color: var(--red); }
+.menu__sep { height: 1px; background: var(--border); margin: 6px 4px; }
+
+/* -------- SUBBAR -------- */
+.subbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 24px; border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+}
+.symbol-select { display: flex; gap: 6px; }
+.symbol {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid transparent; background: transparent;
+  color: var(--fg-mid); font: inherit;
+  white-space: nowrap;
+}
+.symbol:hover { background: var(--card); color: var(--fg); }
+.symbol.is-active { background: var(--card); border-color: var(--border); color: var(--fg); }
+.symbol__tick { font: 600 11.5px var(--sans); letter-spacing: 0.04em; }
+.symbol__px   { font-size: 12.5px; color: var(--fg); }
+.symbol__chg  { font-size: 11.5px; }
+
+.clock { display: flex; align-items: center; gap: 10px; color: var(--fg-mid); font-size: 12px; }
+.clock__lbl { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-size: 10.5px; }
+.clock .divider { width: 1px; height: 12px; background: var(--border); }
+
+/* -------- GRID -------- */
+.grid {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; flex-direction: column;
+  min-width: 0;
+}
+.card__h {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; gap: 12px;
+}
+.card__title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.card__title h2 {
+  margin: 0; font-size: 13px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--fg);
+}
+
+.kbd {
+  font: 600 10px/1 var(--mono); letter-spacing: 0.12em;
+  color: var(--red); background: color-mix(in oklab, var(--red) 15%, transparent);
+  padding: 3px 6px; border-radius: 3px;
+}
+.badge {
+  font: 600 10.5px/1 var(--mono); letter-spacing: 0.1em;
+  padding: 4px 8px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--fg-mid);
+}
+.badge--ok    { color: var(--green); border-color: color-mix(in oklab, var(--green) 40%, var(--border)); }
+.badge--pair  { color: var(--gold); border-color: color-mix(in oklab, var(--gold) 40%, var(--border)); }
+.badge--live  { display: inline-flex; align-items: center; gap: 6px; color: var(--fg-mid); }
+
+.chip {
+  font: 500 11px var(--sans);
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--card-2); color: var(--fg-mid);
+  border: 1px solid var(--border-soft);
+}
+.chip--ghost { background: transparent; }
+
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot--green  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.dot--gold   { background: var(--gold); }
+.dot--orange { background: var(--orange); }
+.dot--red    { background: var(--red); }
+
+/* -------- KPI -------- */
+.kpi-row { grid-column: span 12; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+.kpi {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 8px; min-width: 0;
+  position: relative; overflow: hidden;
+}
+.kpi__h {
+  display: flex; align-items: center; justify-content: space-between;
+  color: var(--muted); font: 600 10.5px/1 var(--sans);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.kpi__val { font-size: 26px; font-weight: 600; color: var(--fg); }
+.kpi__sub { display: flex; gap: 8px; font-size: 12px; color: var(--fg-mid); align-items: baseline; }
+.spark { width: 100%; height: 36px; margin-top: 4px; }
+
+.dd-bar {
+  position: relative; height: 4px; background: var(--border-soft);
+  border-radius: 2px; margin-top: 8px;
+}
+.dd-bar__fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--red); border-radius: 2px; }
+.alloc { display: flex; gap: 2px; margin-top: 8px; height: 4px; }
+.alloc__seg { background: var(--gold); border-radius: 2px; }
+.alloc__seg--res { background: var(--border); }
+
+/* -------- MARKET -------- */
+.card--market { grid-column: span 8; }
+.market__head {
+  display: grid; grid-template-columns: auto 1fr; gap: 24px;
+  align-items: center; margin-bottom: 12px;
+}
+.market__px { font-size: 36px; font-weight: 600; line-height: 1.1; }
+.market__chg { font-size: 13px; }
+.market__stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin: 0;
+}
+.market__stats > div { display: flex; flex-direction: column; gap: 2px; }
+.market__stats dt {
+  font: 600 10px/1 var(--sans); color: var(--muted);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.market__stats dd { margin: 0; font: 600 14px var(--mono); color: var(--fg); }
+
+.chart-wrap {
+  position: relative; background: var(--bg-2);
+  border: 1px solid var(--border-soft); border-radius: var(--radius-sm);
+  padding: 8px 12px 12px;
+}
+.chart { width: 100%; height: 260px; display: block; }
+.chart__legend {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 11px; color: var(--fg-mid); padding-top: 4px;
+}
+.chart__legend .sw { display: inline-block; width: 10px; height: 2px; background: var(--gold); margin-right: 5px; vertical-align: middle; border-radius: 2px; }
+.chart__legend .sw--ma20 { background: var(--info); }
+.chart__legend .sw--ma50 { background: color-mix(in oklab, var(--fg) 40%, transparent); }
+.chart__cursor { margin-left: auto; color: var(--muted); }
+
+.market__foot {
+  display: flex; gap: 22px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft);
+  font-size: 12.5px;
+}
+
+/* -------- RISK -------- */
+.card--risk { grid-column: span 4; }
+.gauge { position: relative; padding: 4px 6px; }
+.gauge__tick { font: 500 10px var(--mono); fill: var(--muted); }
+.gauge__val {
+  text-align: center; margin-top: -18px;
+}
+.gauge__val .num { font-size: 32px; font-weight: 600; }
+.gauge__val .pct { font-size: 18px; color: var(--fg-mid); }
+
+.risk-ladder {
+  list-style: none; padding: 0; margin: 12px 0 0;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+}
+.risk-ladder li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border-soft);
+  border-radius: 8px; background: var(--bg-2);
+}
+.risk-ladder li.is-active { border-color: color-mix(in oklab, var(--green) 50%, var(--border)); background: color-mix(in oklab, var(--green) 6%, var(--card)); }
+.risk-ladder strong { display: block; font-size: 12px; letter-spacing: 0.04em; }
+.risk-ladder .muted { display: block; font: 500 11px var(--mono); }
+
+/* -------- CMD -------- */
+.card--cmd { grid-column: span 4; }
+.cmd-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 42px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid transparent;
+  font: 600 12px/1 var(--sans); letter-spacing: 0.08em;
+  cursor: pointer; transition: 0.15s;
+}
+.btn--primary { background: var(--green); color: oklch(0.18 0.01 150); }
+.btn--primary:hover { filter: brightness(1.08); }
+.btn--danger  { background: var(--red); color: oklch(0.99 0.005 25); }
+.btn--warn    { background: var(--orange); color: oklch(0.18 0.01 55); }
+.btn--ghost   { background: var(--card-2); border-color: var(--border); color: var(--fg); }
+.btn--ghost:hover { background: var(--bg-2); }
+
+.risk-mode { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-soft); }
+.risk-mode__lbl {
+  font: 600 10.5px/1 var(--sans); color: var(--muted);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px;
+}
+.risk-mode__help { font-size: 11.5px; margin-top: 6px; line-height: 1.4; }
+
+.seg {
+  display: inline-flex; padding: 3px; background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: 8px;
+}
+.seg--full { display: flex; }
+.seg--full .seg__b { flex: 1; }
+.seg__b {
+  background: none; border: 0; color: var(--fg-mid);
+  padding: 6px 12px; border-radius: 5px; cursor: pointer;
+  font: 600 11px var(--mono); letter-spacing: 0.08em;
+}
+.seg__b:hover { color: var(--fg); }
+.seg__b.is-active { background: var(--card); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+
+.strategy {
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-soft);
+  display: grid; gap: 6px;
+}
+.strategy__row { display: flex; justify-content: space-between; font-size: 12.5px; }
+
+/* -------- POSITIONS -------- */
+.card--pos { grid-column: span 8; }
+.link { background: none; border: 0; color: var(--gold); cursor: pointer; font: 600 12px var(--sans); }
+.link:hover { filter: brightness(1.1); }
+.table-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th, .tbl td {
+  padding: 12px 10px; text-align: left;
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl th {
+  font: 600 10.5px/1 var(--sans); color: var(--muted);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom-color: var(--border);
+}
+.tbl tbody tr:hover { background: var(--card-2); }
+.tbl .r { text-align: right; }
+.tbl small { color: var(--muted); font-weight: 400; }
+
+.pair { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+.pair__i {
+  display: grid; place-items: center; width: 22px; height: 22px;
+  background: var(--card-2); border-radius: 50%;
+  color: var(--gold); font: 600 12px var(--mono);
+}
+.side {
+  font: 600 10px/1 var(--mono); letter-spacing: 0.1em;
+  padding: 4px 7px; border-radius: 4px;
+}
+.side--long { color: var(--green); background: color-mix(in oklab, var(--green) 15%, transparent); }
+.side--short { color: var(--red); background: color-mix(in oklab, var(--red) 15%, transparent); }
+
+/* -------- ML -------- */
+.card--ml { grid-column: span 4; }
+.signals { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.signals li {
+  display: grid; grid-template-columns: 120px 1fr 90px;
+  gap: 12px; align-items: center;
+}
+.signals__pair { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; }
+.signals__pair .pair__i { width: 20px; height: 20px; font-size: 11px; }
+.signals__bar {
+  height: 6px; background: var(--bg-2);
+  border-radius: 3px; overflow: hidden;
+  border: 1px solid var(--border-soft);
+}
+.signals__bar-fill { height: 100%; border-radius: 3px; }
+.signals__val { font-size: 12px; font-weight: 600; text-align: right; }
+
+/* -------- HISTORY -------- */
+.card--hist { grid-column: span 7; }
+.timeline { list-style: none; padding: 0; margin: 0; min-height: 180px; }
+.timeline__empty {
+  display: flex; align-items: center; gap: 14px;
+  padding: 30px 16px; color: var(--muted);
+  justify-content: center; text-align: left;
+  height: 100%;
+}
+.timeline__empty svg { color: var(--fg-dim); opacity: 0.6; }
+
+/* -------- LOG -------- */
+.card--log { grid-column: span 5; }
+.log {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 2px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: 12px;
+  max-height: 240px; overflow-y: auto;
+}
+.log li {
+  display: grid; grid-template-columns: 70px 50px 1fr;
+  gap: 10px; align-items: center; padding: 4px 8px; border-radius: 4px;
+}
+.log li:hover { background: var(--card-2); }
+.log__t { color: var(--muted); font-size: 11px; }
+.tag {
+  display: inline-grid; place-items: center;
+  font: 600 9.5px/1 var(--mono); letter-spacing: 0.1em;
+  padding: 3px 5px; border-radius: 3px;
+  text-align: center;
+}
+.tag--ok   { color: var(--green); background: color-mix(in oklab, var(--green) 15%, transparent); }
+.tag--info { color: var(--info); background: color-mix(in oklab, var(--info) 15%, transparent); }
+.tag--warn { color: var(--orange); background: color-mix(in oklab, var(--orange) 15%, transparent); }
+
+/* -------- DRAWER -------- */
+.drawer {
+  position: fixed; inset: 0; z-index: 60;
+  pointer-events: none;
+}
+.drawer[aria-hidden="false"] { pointer-events: auto; }
+.drawer__scrim {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+  opacity: 0; transition: 0.25s;
+}
+.drawer[aria-hidden="false"] .drawer__scrim { opacity: 1; }
+.drawer__panel {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: min(880px, 92vw); background: var(--card);
+  border-left: 1px solid var(--border);
+  transform: translateX(100%); transition: 0.32s cubic-bezier(.2,.7,.2,1);
+  display: flex; flex-direction: column;
+}
+.drawer[aria-hidden="false"] .drawer__panel { transform: translateX(0); }
+.drawer__h {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 20px 28px; border-bottom: 1px solid var(--border);
+}
+.drawer__h h2 { margin: 2px 0 0; font-size: 20px; font-weight: 600; }
+.overline {
+  font: 600 10.5px/1 var(--sans); letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+.drawer__body {
+  flex: 1; display: grid; grid-template-columns: 200px 1fr;
+  overflow: hidden;
+}
+.drawer__toc {
+  border-right: 1px solid var(--border); padding: 20px 16px;
+  display: flex; flex-direction: column; gap: 2px;
+  overflow-y: auto;
+}
+.drawer__toc a {
+  padding: 8px 10px; border-radius: 6px;
+  color: var(--fg-mid); text-decoration: none; font-size: 13px;
+}
+.drawer__toc a:hover { background: var(--card-2); color: var(--fg); }
+.drawer__toc a.is-active { background: var(--gold-soft); color: var(--gold); }
+.drawer__content { padding: 20px 28px; overflow-y: auto; }
+.drawer__content h3 { font-size: 16px; margin: 24px 0 12px; display: flex; align-items: baseline; gap: 10px; }
+.drawer__content section:first-child h3 { margin-top: 4px; }
+.drawer__content p { color: var(--fg-mid); margin: 0 0 10px; }
+.defs { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; margin: 0; }
+.defs dt { font: 600 11px var(--mono); letter-spacing: 0.08em; color: var(--gold); }
+.defs dd { margin: 0; color: var(--fg-mid); font-size: 13px; }
+.callout {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px; border: 1px solid color-mix(in oklab, var(--red) 40%, var(--border));
+  background: color-mix(in oklab, var(--red) 8%, transparent);
+  border-radius: 8px; color: var(--fg);
+}
+.callout svg { color: var(--red); flex: 0 0 20px; margin-top: 2px; }
+.callout p { color: var(--fg); margin: 0; }
+
+/* -------- TWEAKS -------- */
+.tweaks {
+  position: fixed; right: 20px; bottom: 20px; z-index: 70;
+  width: 260px; padding: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: 0 12px 30px -8px rgba(0,0,0,.45);
+}
+.tweaks[hidden] { display: none; }
+.tweaks header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.tweaks__row { display: grid; grid-template-columns: 56px 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+.tweaks__row label { font-size: 11.5px; color: var(--muted); }
+.tweaks .seg { width: 100%; }
+.tweaks .seg__b { flex: 1; text-align: center; padding: 5px 6px; font-size: 10px; }
+
+/* density */
+[data-density="dense"] { --gap: 14px; --radius: 10px; }
+[data-density="dense"] .card { padding: 14px 16px; }
+[data-density="dense"] .kpi { padding: 12px 14px; }
+[data-density="dense"] .kpi__val { font-size: 22px; }
+[data-density="dense"] .market__px { font-size: 28px; }
+[data-density="dense"] .tbl th, [data-density="dense"] .tbl td { padding: 8px 8px; }
+
+[data-density="spacious"] { --gap: 28px; }
+[data-density="spacious"] .card { padding: 24px 26px; }
+[data-density="spacious"] .kpi { padding: 22px 24px; }
+
+/* responsive */
+@media (max-width: 1280px) {
+  .nav__tabs { display: none; }
+  .profile__meta { display: none; }
+}
+@media (max-width: 1080px) {
+  .nav__center { display: none; }
+}
+@media (max-width: 1200px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .card--market, .card--pos { grid-column: span 12; }
+  .card--risk, .card--cmd, .card--ml { grid-column: span 6; }
+  .card--hist, .card--log { grid-column: span 12; }
+}
+@media (max-width: 800px) {
+  .nav { grid-template-columns: 1fr auto; gap: 12px; padding: 0 14px; }
+  .nav__center { display: none; }
+  .nav__tabs { display: none; }
+  .profile__meta { display: none; }
+  .grid { padding: 14px; }
+  .kpi-row { grid-template-columns: 1fr; }
+  .card--risk, .card--cmd, .card--ml { grid-column: span 12; }
+  .drawer__body { grid-template-columns: 1fr; }
+  .drawer__toc { display: none; }
+  .market__stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* -------- LOGIN -------- */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.4s;
+}
+.login-overlay.hidden { opacity: 0; pointer-events: none; }
+.login-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px 36px; width: min(400px, 90vw);
+  text-align: center;
+}
+.login-card .brand { justify-content: center; margin-bottom: 24px; font-size: 16px; letter-spacing: 0.18em; }
+.login-card h1 { font-size: 22px; margin: 0 0 6px; }
+.login-card p { color: var(--muted); font-size: 13px; margin: 0 0 28px; }
+.login-field {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--fg); font: inherit; font-size: 14px;
+  outline: none;
+}
+.login-field:focus { border-color: var(--gold); }
+.login-btn {
+  width: 100%; padding: 13px; margin-top: 8px;
+  background: var(--gold); color: oklch(0.16 0.01 85);
+  border: 0; border-radius: 8px; font: 600 14px var(--sans);
+  cursor: pointer; letter-spacing: 0.06em;
+}
+.login-btn:hover { filter: brightness(1.1); }
+.login-btn:disabled { opacity: .5; cursor: wait; }
+.login-error {
+  color: var(--red); font-size: 12px; margin-top: 10px; min-height: 18px;
+}
+.login-spinner {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2px solid transparent; border-top-color: currentColor;
+  border-radius: 50%; animation: spin .6s linear infinite;
+  vertical-align: middle; margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* -------- TOAST -------- */
+.toast-container {
+  position: fixed; top: 80px; right: 20px; z-index: 90;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  padding: 12px 18px; border-radius: 10px;
+  background: var(--card); border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  font-size: 13px; display: flex; align-items: center; gap: 10px;
+  animation: toastIn .3s ease;
+  max-width: 360px;
+}
+.toast--ok { border-color: color-mix(in oklab, var(--green) 50%, var(--border)); }
+.toast--err { border-color: color-mix(in oklab, var(--red) 50%, var(--border)); }
+@keyframes toastIn { from { opacity:0; transform:translateX(20px); } }
+
+/* -------- MODE BADGE -------- */
+.mode-badge {
+  font: 600 10px/1 var(--mono); letter-spacing: 0.1em;
+  padding: 3px 7px; border-radius: 4px;
+}
+.mode-badge--mock { color: var(--info); background: color-mix(in oklab, var(--info) 15%, transparent); }
+.mode-badge--dry { color: var(--orange); background: color-mix(in oklab, var(--orange) 15%, transparent); }
+.mode-badge--live { color: var(--red); background: color-mix(in oklab, var(--red) 15%, transparent); }
+
+/* -------- TRADINGVIEW -------- */
+.tv-container { width: 100%; height: 300px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border-soft); }
+
+.app-content { display: none; }
+.app-content.visible { display: contents; }
+</style>
+</head>
+<body data-theme="dark" data-lang="es" data-density="balanced">
+
+<!-- ░░░ LOGIN OVERLAY ░░░ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <a class="brand" href="#">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 L8 11 L12 14 L16 7 L21 11"/><circle cx="8" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="7" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </span>
+      <span class="brand__word">MCRYPTO</span>
+    </a>
+    <h1>Trading Terminal</h1>
+    <p>Ingresa tus credenciales para acceder al panel</p>
+    <form id="loginForm" autocomplete="off">
+      <input class="login-field" id="loginUser" type="text" placeholder="Usuario" autocomplete="username" required>
+      <input class="login-field" id="loginPass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+      <button class="login-btn" type="submit" id="loginBtn">Iniciar sesión</button>
+    </form>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- ░░░ DASHBOARD (hidden until login) ░░░ -->
+<div class="app-content" id="appContent">
+
+<!-- ░░░ TOP NAV ░░░ -->
+<header class="nav">
+  <div class="nav__left">
+    <a class="brand" href="#">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 L8 11 L12 14 L16 7 L21 11"/><circle cx="8" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="14" r="1.4" fill="currentColor" stroke="none"/><circle cx="16" cy="7" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </span>
+      <span class="brand__word">MCRYPTO</span>
+    </a>
+    <nav class="nav__tabs" role="tablist">
+      <button class="tab is-active" data-tab="overview"><span data-i18n="nav.overview">Resumen</span></button>
+      <button class="tab" data-tab="positions"><span data-i18n="nav.positions">Posiciones</span></button>
+      <button class="tab" data-tab="signals"><span data-i18n="nav.signals">Señales ML</span></button>
+      <button class="tab" data-tab="manual" id="openManual"><span data-i18n="nav.manual">Manual</span></button>
+    </nav>
+  </div>
+
+  <div class="nav__center">
+    <div class="status-pill">
+      <span class="dot dot--green" id="statusDot"></span>
+      <span class="status-pill__label" data-i18n="nav.bot">Bot</span>
+      <strong id="statusText">—</strong>
+      <span class="divider"></span>
+      <span class="status-pill__label" data-i18n="nav.state">Estado</span>
+      <strong class="t-gold" id="gecBadge">—</strong>
+      <span class="divider"></span>
+      <span class="mode-badge mode-badge--mock" id="modeBadge">—</span>
+    </div>
+  </div>
+
+  <div class="nav__right">
+    <div class="toggle-group" role="group" aria-label="Language">
+      <button class="toggle is-active" data-lang-set="es">ES</button>
+      <button class="toggle" data-lang-set="en">EN</button>
+    </div>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">
+      <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+    </button>
+    <button class="icon-btn" aria-label="Telegram" title="Telegram alerts active" style="pointer-events:none;opacity:.6">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L1 11l7 2 2 7 3-4 5 3z"/></svg>
+    </button>
+
+    <!-- profile -->
+    <div class="profile" id="profile">
+      <button class="profile__btn" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="avatar">
+          <span class="avatar__ring"></span>
+          <span class="avatar__img" style="background-image:url('https://images.unsplash.com/photo-1615109398623-88346a601842?w=96&h=96&fit=crop&crop=faces&auto=format&q=70')"></span>
+        </span>
+        <span class="profile__meta">
+          <span class="profile__name" id="profileName">—</span>
+          <span class="profile__role" data-i18n="nav.account">Cuenta principal</span>
+        </span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+
+      <div class="menu" role="menu" aria-hidden="true">
+        <div class="menu__header">
+          <span class="avatar avatar--lg">
+            <span class="avatar__img" style="background-image:url('https://images.unsplash.com/photo-1615109398623-88346a601842?w=160&h=160&fit=crop&crop=faces&auto=format&q=70')"></span>
+          </span>
+          <div>
+            <div class="menu__name" id="menuName">—</div>
+            <div class="menu__mail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="10717c7568507d73626960647f3e797f">[email&#160;protected]</a></div>
+            <div class="menu__tag">MCRYPTO · LIVE</div>
+          </div>
+        </div>
+        <button class="menu__item" role="menuitem">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span data-i18n="menu.profile">Configuración de usuario</span>
+        </button>
+
+        <div class="menu__sep"></div>
+        <button class="menu__item menu__item--danger" role="menuitem">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          <span data-i18n="menu.logout">Cerrar sesión</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ░░░ SUB-BAR: symbol + session clock ░░░ -->
+<div class="subbar">
+  <div class="symbol-select">
+    <button class="symbol is-active" data-sym="ETHUSDT">
+      <span class="symbol__tick">ETH/USDT</span>
+      <span class="symbol__px num">2,036.06</span>
+      <span class="symbol__chg t-green num">+1.24%</span>
+    </button>
+    <button class="symbol" data-sym="BTCUSDT">
+      <span class="symbol__tick">BTC/USDT</span>
+      <span class="symbol__px num">67,412.80</span>
+      <span class="symbol__chg t-red num">−0.42%</span>
+    </button>
+    <button class="symbol" data-sym="SOLUSDT">
+      <span class="symbol__tick">SOL/USDT</span>
+      <span class="symbol__px num">142.18</span>
+      <span class="symbol__chg t-green num">+3.71%</span>
+    </button>
+    <button class="symbol" data-sym="ADAUSDT">
+      <span class="symbol__tick">ADA/USDT</span>
+      <span class="symbol__px num">0.45</span>
+      <span class="symbol__chg t-green num">+1.12%</span>
+    </button>
+  </div>
+  <div class="clock">
+    <span class="clock__lbl" data-i18n="sub.session">Sesión</span>
+    <span class="num" id="clock">14:32:08 UTC</span>
+    <span class="divider"></span>
+    <span class="clock__lbl" data-i18n="sub.uptime">Uptime</span>
+    <span class="num">04d 12h 08m</span>
+  </div>
+</div>
+
+<!-- ░░░ MAIN GRID ░░░ -->
+<main class="grid">
+
+  <!-- KPI row -->
+  <section class="kpi-row">
+    <article class="kpi">
+      <header class="kpi__h">
+        <span data-i18n="kpi.equity">Equity estimada</span>
+        <span class="chip chip--ghost">USDT</span>
+      </header>
+      <div class="kpi__val num" id="kpiEquity">—</div>
+      <div class="kpi__sub">
+        <span class="t-green num">▲ 0.12%</span>
+        <span class="muted" data-i18n="kpi.vs">vs. inicial</span>
+      </div>
+      <svg class="spark" viewBox="0 0 120 36" preserveAspectRatio="none">
+        <path d="M0 24 L10 20 L22 22 L34 15 L46 18 L58 12 L70 14 L82 8 L94 11 L106 6 L120 9" stroke="var(--gold)" fill="none" stroke-width="1.6"/>
+        <path d="M0 24 L10 20 L22 22 L34 15 L46 18 L58 12 L70 14 L82 8 L94 11 L106 6 L120 9 L120 36 L0 36 Z" fill="url(#sparkG)"/>
+        <defs><linearGradient id="sparkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--gold)" stop-opacity=".25"/><stop offset="1" stop-color="var(--gold)" stop-opacity="0"/></linearGradient></defs>
+      </svg>
+    </article>
+
+    <article class="kpi">
+      <header class="kpi__h">
+        <span data-i18n="kpi.pnl">PnL diario</span>
+        <span class="chip chip--ghost">24h</span>
+      </header>
+      <div class="kpi__val num t-green" id="kpiPnl">—</div>
+      <div class="kpi__sub">
+        <span class="num muted">0 <span data-i18n="kpi.trades">ops</span></span>
+        <span class="muted">·</span>
+        <span class="num muted">win 0%</span>
+      </div>
+      <svg class="spark" viewBox="0 0 120 36" preserveAspectRatio="none">
+        <line x1="0" y1="18" x2="120" y2="18" stroke="var(--border)" stroke-dasharray="2 3"/>
+        <path d="M0 20 L12 18 L24 19 L36 17 L48 18 L60 16 L72 18 L84 15 L96 17 L108 14 L120 16" stroke="var(--green)" fill="none" stroke-width="1.6"/>
+      </svg>
+    </article>
+
+    <article class="kpi">
+      <header class="kpi__h">
+        <span data-i18n="kpi.drawdown">Drawdown actual</span>
+        <span class="chip chip--ghost">MAX 10%</span>
+      </header>
+      <div class="kpi__val num t-red" id="kpiDrawdown">—</div>
+      <div class="kpi__sub">
+        <span class="muted num">Límite −10.00%</span>
+      </div>
+      <div class="dd-bar" aria-hidden="true">
+        <div class="dd-bar__fill" style="width:3%"></div>
+        <div class="dd-bar__limit" style="left:100%"></div>
+      </div>
+    </article>
+
+    <article class="kpi">
+      <header class="kpi__h">
+        <span data-i18n="kpi.cash">Efectivo disponible</span>
+        <span class="chip chip--ghost">100%</span>
+      </header>
+      <div class="kpi__val num" id="kpiCash">—</div>
+      <div class="kpi__sub">
+        <span class="muted" data-i18n="kpi.reserve">Reserva</span>
+        <span class="num">5,200.00</span>
+      </div>
+      <div class="alloc">
+        <span class="alloc__seg" style="flex:7" title="Cash"></span>
+        <span class="alloc__seg alloc__seg--res" style="flex:3" title="Reserve"></span>
+      </div>
+    </article>
+  </section>
+
+  <!-- Live market chart -->
+  <section class="card card--market">
+    <header class="card__h">
+      <div class="card__title">
+        <span class="kbd">LIVE</span>
+        <h2 data-i18n="market.title">Mercado en vivo</h2>
+        <span class="badge badge--pair">ETH/USDT</span>
+      </div>
+      <div class="card__actions">
+      </div>
+    </header>
+
+
+
+    <div class="tv-container" id="tvChart"></div>
+
+    <footer class="market__foot">
+      <span><span class="muted" data-i18n="market.confidence">Confianza ML</span> <span class="num t-gold" id="mlConfidence">—</span></span>
+      <span><span class="muted" data-i18n="market.vol2">Volatilidad</span> <span class="num" id="mlVolatility">—</span></span>
+    </footer>
+  </section>
+
+  <!-- Risk governance -->
+  <section class="card card--risk">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="risk.title">Gobernanza de riesgo</h2>
+        <span class="badge badge--ok" data-i18n="risk.gec">GEC NORMAL</span>
+      </div>
+    </header>
+
+    <div class="gauge">
+      <svg viewBox="0 0 160 100" width="100%">
+        <defs>
+          <linearGradient id="gg" x1="0" x2="1">
+            <stop offset="0" stop-color="var(--green)"/>
+            <stop offset=".55" stop-color="var(--gold)"/>
+            <stop offset="1" stop-color="var(--red)"/>
+          </linearGradient>
+        </defs>
+        <path d="M15 90 A 65 65 0 0 1 145 90" stroke="var(--border)" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <path d="M15 90 A 65 65 0 0 1 145 90" stroke="url(#gg)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="204" stroke-dashoffset="200"/>
+        <g id="needle" transform="rotate(-88 80 90)">
+          <line x1="80" y1="90" x2="80" y2="32" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="80" cy="90" r="4" fill="var(--fg)"/>
+        </g>
+        <text x="20" y="95" class="gauge__tick">0%</text>
+        <text x="75" y="25" class="gauge__tick" text-anchor="middle">15%</text>
+        <text x="140" y="95" class="gauge__tick" text-anchor="end">30%</text>
+      </svg>
+      <div class="gauge__val">
+        <div class="num">0.0<span class="pct">%</span></div>
+        <div class="muted" data-i18n="risk.exposure">Exposición Global (ER)</div>
+      </div>
+    </div>
+
+    <ul class="risk-ladder">
+      <li class="is-active">
+        <span class="dot dot--green"></span>
+        <div><strong>NORMAL</strong><span class="muted" data-i18n="risk.n">ER &lt; 20%</span></div>
+      </li>
+      <li>
+        <span class="dot dot--gold"></span>
+        <div><strong>SOFT_CAP</strong><span class="muted" data-i18n="risk.s">ER ≥ 20%</span></div>
+      </li>
+      <li>
+        <span class="dot dot--orange"></span>
+        <div><strong>HARD_CAP</strong><span class="muted" data-i18n="risk.h">ER ≥ 30%</span></div>
+      </li>
+      <li>
+        <span class="dot dot--red"></span>
+        <div><strong>FREEZE</strong><span class="muted">Hold only</span></div>
+      </li>
+      <li>
+        <span class="dot dot--red"></span>
+        <div><strong>KILL_SWITCH</strong><span class="muted" data-i18n="risk.k">Bloqueo</span></div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Command panel -->
+  <section class="card card--cmd">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="cmd.title">Panel de comando</h2>
+      </div>
+      <span class="muted num" data-i18n="cmd.last">Última acción · hace 2m</span>
+    </header>
+
+    <div class="cmd-grid">
+      <button class="btn btn--primary">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <span>START</span>
+      </button>
+      <button class="btn btn--ghost">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+        <span>STOP</span>
+      </button>
+      <button class="btn btn--danger">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r=".8" fill="currentColor"/></svg>
+        <span>EMERGENCY KILL</span>
+      </button>
+      <button class="btn btn--warn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0"/></svg>
+        <span>UNLOCK</span>
+      </button>
+    </div>
+
+    <div class="risk-mode">
+      <div class="risk-mode__lbl" data-i18n="cmd.mode">Modo de riesgo</div>
+      <div class="seg seg--full" id="riskModeGroup">
+        <button class="seg__b is-active" data-risk="NORMAL">NORMAL</button>
+        <button class="seg__b" data-risk="CONSERVATIVE">CONSERVADOR</button>
+      </div>
+      <div class="risk-mode__help muted" data-i18n="cmd.modeHelp">
+        Exposición máxima 30% · DCA estándar · SL 2.5%
+      </div>
+    </div>
+
+    <div class="strategy">
+      <div class="strategy__row">
+        <span class="muted" data-i18n="cmd.strategy">Estrategia activa</span>
+        <span class="t-gold">ML-DCA</span>
+      </div>
+      <div class="strategy__row">
+        <span class="muted" data-i18n="cmd.next">Próximo ciclo</span>
+        <span class="num" id="nextCycle">00:47</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Positions -->
+  <section class="card card--pos">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="pos.title">Posiciones abiertas</h2>
+        <span class="chip" id="posCount">0 <span data-i18n="pos.active">activas</span></span>
+      </div>
+    </header>
+
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th data-i18n="pos.pair">Par</th>
+            <th data-i18n="pos.side">Lado</th>
+            <th class="r" data-i18n="pos.size">Tamaño</th>
+            <th class="r" data-i18n="pos.entry">Entrada</th>
+            <th class="r" data-i18n="pos.mark">Marca</th>
+            <th class="r" data-i18n="pos.pnlu">PnL no realizado</th>
+            <th class="r">TP / SL</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="posBody">
+          <tr class="timeline__empty" id="posEmpty">
+            <td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">No hay posiciones abiertas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ML Signals -->
+  <section class="card card--ml">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="ml.title">Señales ML</h2>
+        <span class="badge badge--live"><span class="dot dot--green"></span> live</span>
+      </div>
+    </header>
+
+    <ul class="signals">
+      <li>
+        <div class="signals__pair"><span class="pair__i">Ξ</span>ETH/USDT</div>
+        <div class="signals__bar">
+          <div class="signals__bar-fill" style="width:72%; background:var(--green)"></div>
+        </div>
+        <div class="signals__val num t-green">0.72 BUY</div>
+      </li>
+      <li>
+        <div class="signals__pair"><span class="pair__i">₿</span>BTC/USDT</div>
+        <div class="signals__bar">
+          <div class="signals__bar-fill" style="width:46%; background:var(--gold)"></div>
+        </div>
+        <div class="signals__val num t-gold">0.46 HOLD</div>
+      </li>
+      <li>
+        <div class="signals__pair"><span class="pair__i">◎</span>SOL/USDT</div>
+        <div class="signals__bar">
+          <div class="signals__bar-fill" style="width:81%; background:var(--green)"></div>
+        </div>
+        <div class="signals__val num t-green">0.81 BUY</div>
+      </li>
+      <li>
+        <div class="signals__pair"><span class="pair__i">◇</span>ADA/USDT</div>
+        <div class="signals__bar">
+          <div class="signals__bar-fill" style="width:28%; background:var(--red)"></div>
+        </div>
+        <div class="signals__val num t-red">0.28 SELL</div>
+      </li>
+      <li>
+        <div class="signals__pair"><span class="pair__i">Ð</span>DOGE/USDT</div>
+        <div class="signals__bar">
+          <div class="signals__bar-fill" style="width:58%; background:var(--gold)"></div>
+        </div>
+        <div class="signals__val num t-gold">0.58 HOLD</div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Execution history -->
+  <section class="card card--hist">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="hist.title">Historial de ejecución</h2>
+      </div>
+      <div class="seg">
+        <button class="seg__b is-active" data-i18n="hist.today">Hoy</button>
+        <button class="seg__b" data-i18n="hist.week">Semana</button>
+        <button class="seg__b" data-i18n="hist.all">Todo</button>
+      </div>
+    </header>
+    <ul class="timeline">
+      <li class="timeline__empty">
+        <svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="20"/><path d="M24 14v10l7 4"/></svg>
+        <div>
+          <div class="t-mid" data-i18n="hist.empty">No hay operaciones recientes</div>
+          <div class="muted" data-i18n="hist.empty2">Las ejecuciones aparecerán aquí en tiempo real</div>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Event log / ticker -->
+  <section class="card card--log">
+    <header class="card__h">
+      <div class="card__title">
+        <h2 data-i18n="log.title">Flujo de eventos</h2>
+        <span class="badge badge--live"><span class="dot dot--green"></span> stream</span>
+      </div>
+      <button class="link" data-i18n="log.clear">Limpiar</button>
+    </header>
+    <ol class="log" id="log">
+      <li><span class="log__t num">14:32:08</span><span class="tag tag--ok">OK</span><span>Heartbeat ML-DCA v4.2 · cycle #8421</span></li>
+      <li><span class="log__t num">14:31:52</span><span class="tag tag--info">INFO</span><span>Feature snapshot ETH/USDT · conf 0.72</span></li>
+      <li><span class="log__t num">14:30:14</span><span class="tag tag--ok">OK</span><span>GEC tick · ER 0.0% · state NORMAL</span></li>
+      <li><span class="log__t num">14:28:00</span><span class="tag tag--warn">WARN</span><span>Latency spike Binance · 412ms</span></li>
+      <li><span class="log__t num">14:24:41</span><span class="tag tag--info">INFO</span><span>Model reload · weights checksum ok</span></li>
+      <li><span class="log__t num">14:22:02</span><span class="tag tag--ok">OK</span><span>Session start · account MCRYPTO-LIVE</span></li>
+    </ol>
+  </section>
+
+</main>
+
+</div><!-- /app-content -->
+
+<!-- ░░░ MANUAL DRAWER ░░░ -->
+<aside class="drawer" id="manual" aria-hidden="true">
+  <div class="drawer__scrim" data-close></div>
+  <section class="drawer__panel" role="dialog" aria-labelledby="manualTitle">
+    <header class="drawer__h">
+      <div>
+        <div class="overline" data-i18n="manual.kicker">Documentación</div>
+        <h2 id="manualTitle" data-i18n="manual.title">Manual del Operador · MCrypto</h2>
+      </div>
+      <button class="icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </header>
+
+    <div class="drawer__body">
+      <nav class="drawer__toc">
+        <a href="#m-mission" class="is-active" data-i18n="manual.toc1">Misión del sistema</a>
+        <a href="#m-gec" data-i18n="manual.toc2">Gobernanza de riesgo</a>
+        <a href="#m-panel" data-i18n="manual.toc3">Panel de control</a>
+        <a href="#m-modes" data-i18n="manual.toc4">Modos de riesgo</a>
+        <a href="#m-disc" data-i18n="manual.toc5">Descargo</a>
+      </nav>
+
+      <div class="drawer__content">
+        <section id="m-mission">
+          <h3><span class="overline t-gold">01</span> <span data-i18n="manual.s1">Misión del sistema</span></h3>
+          <p data-i18n="manual.p1">MCrypto es un motor de trading institucional diseñado para capturar movimientos de mercado mediante Machine Learning y estrategias de DCA inteligente. Su prioridad absoluta es la <strong>preservación del capital</strong>.</p>
+        </section>
+
+        <section id="m-gec">
+          <h3><span class="overline t-gold">02</span> <span data-i18n="manual.s2">Gobernanza de riesgo (GEC)</span></h3>
+          <p data-i18n="manual.p2">Es el "cerebro de seguridad". Monitorea la Exposición Global (ER) — cuánto capital tienes en juego frente al total.</p>
+          <dl class="defs">
+            <dt>NORMAL</dt><dd data-i18n="manual.d1">El bot opera según la estrategia ML.</dd>
+            <dt>SOFT_CAP</dt><dd data-i18n="manual.d2">ER ≥ 20%. Reduce el tamaño de nuevas compras.</dd>
+            <dt>HARD_CAP</dt><dd data-i18n="manual.d3">ER ≥ 30%. Se prohíben aperturas; solo cierres.</dd>
+            <dt>KILL_SWITCH</dt><dd data-i18n="manual.d4">Bloqueo por pérdidas consecutivas o drawdown crítico.</dd>
+          </dl>
+        </section>
+
+        <section id="m-panel">
+          <h3><span class="overline t-gold">03</span> <span data-i18n="manual.s3">Panel de control</span></h3>
+          <dl class="defs">
+            <dt>START</dt><dd data-i18n="manual.d5">Activa el ciclo de lectura y ejecución ML.</dd>
+            <dt>STOP</dt><dd data-i18n="manual.d6">Pausa ordenadamente. No cierra posiciones.</dd>
+            <dt>EMERGENCY KILL</dt><dd data-i18n="manual.d7">Detiene el bot y activa el bloqueo de seguridad.</dd>
+            <dt>UNLOCK</dt><dd data-i18n="manual.d8">Resetea el sistema tras un bloqueo.</dd>
+          </dl>
+        </section>
+
+        <section id="m-modes">
+          <h3><span class="overline t-gold">04</span> <span data-i18n="manual.s4">Modos de riesgo</span></h3>
+          <dl class="defs">
+            <dt>NORMAL</dt><dd data-i18n="manual.d9">Configuración estándar (30% máx.).</dd>
+            <dt>CONSERVADOR</dt><dd data-i18n="manual.d10">Reduce a la mitad (15% máx.). Ideal para alta volatilidad.</dd>
+            <dt>AGRESIVO</dt><dd data-i18n="manual.d11">45% máx. Solo usuarios experimentados.</dd>
+          </dl>
+        </section>
+
+        <section id="m-disc">
+          <h3><span class="overline t-gold">05</span> <span data-i18n="manual.s5">Descargo</span></h3>
+          <div class="callout">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r=".8" fill="currentColor"/></svg>
+            <p data-i18n="manual.p3">El trading implica riesgo de pérdida total. Use MCrypto bajo su propia responsabilidad. El modo MOCK no garantiza resultados en LIVE.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</aside>
+
+<!-- ░░░ TWEAKS PANEL ░░░ -->
+<aside class="tweaks" id="tweaks" hidden>
+  <header>
+    <strong>Tweaks</strong>
+    <button class="icon-btn icon-btn--sm" id="tweaksClose"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </header>
+  <div class="tweaks__row">
+    <label>Tema</label>
+    <div class="seg">
+      <button class="seg__b" data-tw="theme" data-v="dark">Dark</button>
+      <button class="seg__b" data-tw="theme" data-v="light">Light</button>
+    </div>
+  </div>
+  <div class="tweaks__row">
+    <label>Idioma</label>
+    <div class="seg">
+      <button class="seg__b" data-tw="lang" data-v="es">ES</button>
+      <button class="seg__b" data-tw="lang" data-v="en">EN</button>
+    </div>
+  </div>
+  <div class="tweaks__row">
+    <label>Densidad</label>
+    <div class="seg">
+      <button class="seg__b" data-tw="density" data-v="spacious">Spacious</button>
+      <button class="seg__b" data-tw="density" data-v="balanced">Balanced</button>
+      <button class="seg__b" data-tw="density" data-v="dense">Dense</button>
+    </div>
+  </div>
+  <div class="tweaks__row">
+    <label>Acento</label>
+    <div class="seg">
+      <button class="seg__b" data-tw="accent" data-v="gold">Gold</button>
+      <button class="seg__b" data-tw="accent" data-v="teal">Teal</button>
+      <button class="seg__b" data-tw="accent" data-v="violet">Violet</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+window.__I18N = {
+  es: {
+    "nav.overview":"Resumen","nav.positions":"Posiciones","nav.signals":"Señales ML","nav.manual":"Manual",
+    "nav.bot":"Bot","nav.state":"Estado","nav.account":"Cuenta principal",
+    "menu.profile":"Configuración de usuario","menu.logout":"Cerrar sesión",
+    "sub.session":"Sesión","sub.uptime":"Uptime",
+    "kpi.equity":"Equity estimada","kpi.pnl":"PnL diario","kpi.drawdown":"Drawdown actual",
+    "kpi.cash":"Efectivo disponible","kpi.vs":"vs. inicial","kpi.trades":"ops","kpi.reserve":"Reserva",
+    "market.title":"Mercado en vivo","market.confidence":"Confianza ML","market.vol2":"Volatilidad",
+    "risk.title":"Gobernanza de riesgo","risk.exposure":"Exposición Global (ER)",
+    "risk.n":"ER < 20%","risk.s":"ER ≥ 20%","risk.h":"ER ≥ 30%","risk.k":"Bloqueo",
+    "cmd.title":"Panel de comando","cmd.mode":"Modo de riesgo",
+    "cmd.modeHelp":"Exposición máxima 30% · DCA estándar · SL 2.5%",
+    "cmd.strategy":"Estrategia activa","cmd.next":"Próximo ciclo",
+    "pos.title":"Posiciones abiertas","pos.active":"activas",
+    "pos.pair":"Par","pos.side":"Lado","pos.size":"Tamaño","pos.entry":"Entrada","pos.mark":"Marca",
+    "pos.pnlu":"PnL no realizado","ml.title":"Señales ML",
+    "hist.title":"Historial de ejecución","hist.today":"Hoy","hist.week":"Semana","hist.all":"Todo",
+    "hist.empty":"No hay operaciones recientes","hist.empty2":"Las ejecuciones aparecerán aquí en tiempo real",
+    "log.title":"Flujo de eventos","log.clear":"Limpiar",
+    "manual.kicker":"Documentación","manual.title":"Manual del Operador · MCrypto",
+    "manual.toc1":"Misión del sistema","manual.toc2":"Gobernanza de riesgo","manual.toc3":"Panel de control",
+    "manual.toc4":"Modos de riesgo","manual.toc5":"Descargo",
+    "manual.s1":"Misión del sistema","manual.s2":"Gobernanza de riesgo (GEC)",
+    "manual.s3":"Panel de control","manual.s4":"Modos de riesgo","manual.s5":"Descargo",
+    "manual.p1":"MCrypto es un motor de trading diseñado para capturar movimientos de mercado mediante ML y DCA inteligente. Prioridad: preservación del capital.",
+    "manual.p2":"Monitorea la Exposición Global (ER) — cuánto capital tienes en juego frente al total.",
+    "manual.p3":"El trading implica riesgo de pérdida total. Use MCrypto bajo su propia responsabilidad.",
+    "manual.d1":"El bot opera según la estrategia ML.","manual.d2":"ER ≥ 20%. Reduce el tamaño de nuevas compras.",
+    "manual.d3":"ER ≥ 30%. Se prohíben aperturas; solo cierres.","manual.d4":"Bloqueo por pérdidas consecutivas.",
+    "manual.d5":"Activa el ciclo de lectura y ejecución ML.","manual.d6":"Pausa ordenadamente. No cierra posiciones.",
+    "manual.d7":"Detiene el bot y activa el bloqueo.","manual.d8":"Resetea el sistema tras un bloqueo.",
+    "manual.d9":"Configuración estándar (30% máx.).","manual.d10":"Reduce a la mitad (15% máx.)."
+  },
+  en: {
+    "nav.overview":"Overview","nav.positions":"Positions","nav.signals":"ML Signals","nav.manual":"Manual",
+    "nav.bot":"Bot","nav.state":"State","nav.account":"Primary account",
+    "menu.profile":"User settings","menu.logout":"Log out",
+    "sub.session":"Session","sub.uptime":"Uptime",
+    "kpi.equity":"Estimated equity","kpi.pnl":"Daily PnL","kpi.drawdown":"Current drawdown",
+    "kpi.cash":"Available cash","kpi.vs":"vs. start","kpi.trades":"trades","kpi.reserve":"Reserve",
+    "market.title":"Live market","market.confidence":"ML Confidence","market.vol2":"Volatility",
+    "risk.title":"Risk governance","risk.exposure":"Global Exposure (ER)",
+    "risk.n":"ER < 20%","risk.s":"ER ≥ 20%","risk.h":"ER ≥ 30%","risk.k":"Lockdown",
+    "cmd.title":"Command panel","cmd.mode":"Risk mode",
+    "cmd.modeHelp":"Max exposure 30% · Standard DCA · SL 2.5%",
+    "cmd.strategy":"Active strategy","cmd.next":"Next cycle",
+    "pos.title":"Open positions","pos.active":"active",
+    "pos.pair":"Pair","pos.side":"Side","pos.size":"Size","pos.entry":"Entry","pos.mark":"Mark",
+    "pos.pnlu":"Unrealized PnL","ml.title":"ML signals",
+    "hist.title":"Execution history","hist.today":"Today","hist.week":"Week","hist.all":"All",
+    "hist.empty":"No recent operations","hist.empty2":"Executions will appear here in real time",
+    "log.title":"Event stream","log.clear":"Clear",
+    "manual.kicker":"Documentation","manual.title":"Operator Manual · MCrypto",
+    "manual.toc1":"System mission","manual.toc2":"Risk governance","manual.toc3":"Control panel",
+    "manual.toc4":"Risk modes","manual.toc5":"Disclaimer",
+    "manual.s1":"System mission","manual.s2":"Risk governance (GEC)",
+    "manual.s3":"Control panel","manual.s4":"Risk modes","manual.s5":"Disclaimer",
+    "manual.p1":"MCrypto is a trading engine designed to capture market movements via ML and intelligent DCA. Top priority: capital preservation.",
+    "manual.p2":"It monitors Global Exposure (ER) — how much capital is at stake vs. your total.",
+    "manual.p3":"Trading involves risk of total loss. Use MCrypto at your own responsibility.",
+    "manual.d1":"Bot runs the ML strategy.","manual.d2":"ER ≥ 20%. Reduces size of new buys.",
+    "manual.d3":"ER ≥ 30%. No new openings; closings only.","manual.d4":"Lockdown on consecutive losses.",
+    "manual.d5":"Starts the ML read & execution cycle.","manual.d6":"Pauses cleanly. Does not close positions.",
+    "manual.d7":"Stops the bot and activates safety lock.","manual.d8":"Resets the system after a lock.",
+    "manual.d9":"Standard configuration (30% max).","manual.d10":"Halves limits (15% max)."
+  }
+};
+</script>
+<script src="app.js"></script>
+</body>
+</html>
